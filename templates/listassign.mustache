@@ -1,0 +1,68 @@
+<h3>{{# str }}anonymousassignments, report_assign{{/ str }}</h3>
+
+{{^ isassignments }}
+    <div class="alert alert-warning">{{# str }}noassignments, report_assign{{/ str }}</div>
+{{/ isassignments }}
+
+{{# isassignments }}
+    <div class="row alert alert-primary">
+        <div class="col-sm-10">
+            <span style="font-size: 1.5rem">{{# str }}selectassignment, report_assign{{/ str }}</span>
+        </div>
+        <div class="col-sm-2">
+            <a href="{{{ exportallurl }}}" class="btn btn-success"><i class="fa fa-share-square-o"></i> {{# str }}exportall, report_assign{{/ str }}</a>
+        </div>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>{{# str }}name{{/ str }}</th>
+                <th>{{# str }}status{{/ str }}</th>
+                <th>{{# str }}groupmode{{/ str }}</th>
+                {{# enableplagiarism }}
+                    <th>{{# str }}plagiarism, report_assign{{/ str }}</th>
+                {{/ enableplagiarism }}
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{# assignments }}
+                <tr>
+                    <td>{{ name }}</td>
+                    <td class="h5">
+                        {{# blindmarking }}
+                            <span class="badge badge-secondary">{{# str }}blindmarkingon, report_assign{{/ str }}</span>
+                        {{/ blindmarking }}
+                        {{# revealidentities }}
+                            <span class="badge badge-success">{{# str }}revealidentities, report_assign{{/ str }}</span>
+                        {{/ revealidentities }}
+                        {{# markingworkflow }}
+                            <span class="badge badge-warning">{{# str }}workflowon, report_assign{{/ str }}</span>
+                        {{/ markingworkflow }}
+                        {{# markingallocation }}
+                            <span class="badge badge-primary">{{# str }}allocationon, report_assign{{/ str }}</span>
+                        {{/ markingallocation }}
+                        {{# groupsubmission }}
+                            <span class="badge badge-dark">{{# str }}groupsubmission, report_assign{{/ str }}</span>
+                        {{/ groupsubmission }}
+                    </td>
+                    <td>{{ groupmode }}</td>
+                    {{# enableplagiarism }}
+                        <td>
+                            {{# urkundenabled }}{{# pix }}urkund, report_assign, {{# str }}urkundenabled, report_assign{{/ str }}{{/ pix }}{{/ urkundenabled}}
+                            {{# turnitinenabled }}{{# pix }}turnitin, report_assign, {{# str }}turnitinenabled, report_assign{{/ str }}{{/ pix }}{{/ turnitinenabled}}
+                        </td>
+                    {{/ enableplagiarism }}
+                    <td>
+                        <div class="btn-group">
+                            <a href="{{{ showlink }}}" class="btn btn-sm btn-primary"><i class="fa fa-list"></i> {{# str }}show{{/ str }}</a>
+                            <a href="{{{ exportlink }}}" class="btn btn-sm btn-success"><i class="fa fa-share-square-o"></i> {{# str }}export, report_assign{{/ str }}</a>
+                            <a href="{{{ dumplink }}}" class="btn btn-sm btn-warning"><i class="fa fa-download"></i> {{# str }}download{{/ str }}</a>
+                        </div>
+                    </td>
+                </tr>
+            {{/ assignments }}
+        </tbody>
+    </table>
+{{/ isassignments }}

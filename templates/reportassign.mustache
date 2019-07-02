@@ -1,0 +1,82 @@
+<h2>"{{ assignment.name }}"</h2>
+
+{{# groupselect }}
+<div class="card text-white bg-primary">
+    <div class="card-body">
+        <form>
+            <div class="form-group">
+                <label for="groupfilter" class="col-form-label-lg">{{# str }}group, report_assign{{/ str }}</label>
+                <select class="form-control col-sm-3" id="groupfilter" name="groupfilter">
+                    <option value="0">{{# str }}all{{/ str }}</option>
+                    {{# groups }}
+                        <option value="{{ id }}">{{ name }}</option>
+                    {{/ groups }}
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
+{{/ groupselect }}
+
+<table class="table table-striped">
+    <thead>
+        <th>{{# str }}username{{/ str }}</th>
+        {{# profilefields }}
+            <th>{{{ . }}}</th>
+        {{/ profilefields }}
+        {{# groupselect }}
+            <th>{{# str }}groups{{/ str }}</th>
+        {{/ groupselect }}
+        <th>{{# str }}status{{/ str }}</th>
+        <th>{{# str }}grade{{/ str }}</th>
+        {{# urkundenabled }}
+            <th>{{# str }}urkund, report_assign{{/ str }}</th>
+        {{/ urkundenabled }}
+        {{# turnitinenabled }}
+            <th>{{# str }}turnitin, report_assign{{/ str }}</th>
+        {{/ turnitinenabled }}
+        {{# assignment.markingallocation }}
+            <th>{{# str }}allocatedmarker, report_assign{{/ str }}</th>
+        {{/ assignment.markingallocation }}
+        <th>{{# str }}modified{{/ str }}</th>
+        <th class="w-25">{{# str }}files{{/ str }}</th>
+    </thead>
+    <tbody>
+        {{# submissions }}
+            <tr class="group_0 {{# groupids }}group_{{ . }} {{/ groupids}}">
+                <td>{{ fullname }}</td>
+                {{# profiledata }}
+                    <td>{{ . }}</td>
+                {{/ profiledata }}
+                {{# groupselect }}
+                    <td>{{ groups }}</td>
+                {{/ groupselect }}
+                <td>{{ status }}</td>
+                <td>{{{ grade }}}</td>
+                {{# urkundenabled }}
+                    <td>
+                        {{# urkund }}
+                            {{# pix }}urkund, report_assign, {{# str }}urkund, report_assign{{/ str }}{{/ pix }}{{ urkund.similarityscore }}
+                        {{/ urkund }}
+                    </td>
+                {{/ urkundenabled }}
+                {{# turnitinenabled }}
+                    <td>
+                        {{# turnitin }}
+                            {{# pix }}turnitin, report_assign, {{# str }}turnitin, report_assign{{/ str }}{{/ pix }}{{ turnitin.similarityscore }}
+                        {{/ turnitin }}
+                    </td>
+                {{/ turnitinenabled }}
+                {{# assignment.markingallocation }}
+                    <td>{{ grader }}</td>
+                {{/ assignment.markingallocation }}
+                <td>{{ modified }}</td>
+                <td class="w-25">{{ files }}</td>
+            </tr>
+        {{/ submissions }}
+    <tbody>
+</table>
+
+<div>
+    <a href="{{{ backurl }}}" class="btn btn-primary">{{# str }}back{{/ str }}</a>
+</div>
