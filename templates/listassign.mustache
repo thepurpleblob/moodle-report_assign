@@ -29,7 +29,7 @@
         <tbody>
             {{# assignments }}
                 <tr>
-                    <td>{{ name }}</td>
+                    <td><a href="{{{ assignurl }}}"><i class="fa fa-external-link"></i></a> {{ name }}</td>
                     <td class="h5">
                         {{# blindmarking }}
                             <span class="badge badge-secondary">{{# str }}blindmarkingon, report_assign{{/ str }}</span>

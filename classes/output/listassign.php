@@ -71,11 +71,13 @@ class listassign implements renderable, templatable {
      */
     protected function format_assignments($assignments) {
         foreach ($assignments as $assid => $assignment) {
+            $cm = \get_coursemodule_from_instance('assign', $assignment->id, 0, false, MUST_EXIST);
             $assign = \report_assign\lib::get_assign($this->course, $assid);
             $assignment->showlink = new \moodle_url($this->fullurl, ['assign' => $assid]);
             $assignment->exportlink = new \moodle_url($this->fullurl, ['assign' => $assid, 'export' => 1]);
             $assignment->dumplink = new \moodle_url('/report/assign/dump.php', ['assign' => $assid, 'id' => $this->course->id]);
             $assignment->groupsubmission = $assign->get_instance()->teamsubmission;
+            $assignment->assignurl = new \moodle_url('/mod/assign/view.php', ['id' => $cm->id]);
 
             // Groups.
             $cm = get_coursemodule_from_instance('assign', $assid);
