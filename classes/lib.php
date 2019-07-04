@@ -461,10 +461,16 @@ class lib {
 
         foreach ($submissions as $submission) {
             $userid = $submission->id;
+            $userflags = $assign->get_user_flags($userid, false);
             if ($instance->teamsubmission) {
                 $usersubmission = $assign->get_group_submission($userid, 0, false);
             } else {
                 $usersubmission = $assign->get_user_submission($userid, false);
+            }
+            if ($submission->grantedextension && !empty($userflags)) {
+                $submission->extensionduedate = userdate($userflags->extensionduedate, $dateformat);
+            } else {
+                $submission->extensionduedate = '-';
             }
             if ($usersubmission) {
                 $submission->created = userdate($usersubmission->timecreated, $dateformat);
@@ -622,6 +628,7 @@ class lib {
             $myxls->write_string(3, $i++, get_string('allocatedmarker', 'report_assign'));
         }
         $myxls->write_string(3, $i++, get_string('modified'));
+        $myxls->write_string(3, $i++, get_string('extension', 'report_assign'));
         $myxls->write_string(3, $i++, get_string('files'));
 
         // Add some data.
@@ -648,6 +655,7 @@ class lib {
                 $myxls->write_string($row, $i++, $s->grader);
             }
             $myxls->write_string($row, $i++, $s->modified);
+            $myxls->write_string($row, $i++, $s->extensionduedate);
             $myxls->write_string($row, $i++, $s->files);
             $row++;
         }
@@ -697,6 +705,8 @@ class lib {
         }
         $myxls->write_string(1, $i++, get_string('allocatedmarker', 'report_assign'));
         $myxls->write_string(1, $i++, get_string('modified'));
+        $myxls->write_string(1, $i++, get_string('duedate', 'report_assign'));
+        $myxls->write_string(1, $i++, get_string('extension', 'report_assign'));
         $myxls->write_string(1, $i++, get_string('files'));
 
         // Add some data.
@@ -720,6 +730,8 @@ class lib {
             }
             $myxls->write_string($row, $i++, isset($s->grader) ? $s->grader : '-');
             $myxls->write_string($row, $i++, $s->modified);
+            $myxls->write_string($row, $i++, $s->duedate);
+            $myxls->write_string($row, $i++, $s->extensionduedate);
             $myxls->write_string($row, $i++, $s->files);
             $row++;
         }

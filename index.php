@@ -77,12 +77,13 @@ if ($exportall) {
             continue;
         }
         $assign = \report_assign\lib::get_assign($course, $assignid);
-        $assignment = $DB->get_record('assign', ['id' => $assignid], '*', MUST_EXIST);
+        //$assignment = $DB->get_record('assign', ['id' => $assignid], '*', MUST_EXIST);
         $submissions = $assign->list_participants_with_filter_status_and_group(0);
         $cm = get_coursemodule_from_instance('assign', $assignid);
         $submissions = report_assign\lib::add_assignment_data($course->id, $assignid, $cm->id, $assign, $submissions);
         foreach ($submissions as $submission) {
             $submission->assignmentname = $assignment->name;
+            $submission->duedate = empty($assignment->duedate) ? '-' : userdate($assignment->duedate, get_string('strftimedatetimeshort', 'langconfig'));
         }
         $allsubmissions = array_merge($allsubmissions, $submissions);
     }
