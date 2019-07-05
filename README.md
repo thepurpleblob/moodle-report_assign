@@ -28,3 +28,9 @@ Use
 
 * To set the additional user fields go to Site administration > Plugins > Reports > Assignment submission report
 * To use in a course, got to Settings cog > More... > Reports > Assignment submission report
+
+History
+======
+
+* 1.2.0 - initial release
+* 1.2.2 - Adds 'extension date' and 'due date' (to 'export all'). Unused strings removed
