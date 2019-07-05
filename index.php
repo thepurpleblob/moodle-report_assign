@@ -70,7 +70,7 @@ $assignments = report_assign\lib::get_assignments($id);
 if ($exportall) {
     $filename = "assign_{$course->shortname}.xls";
 
-    // Combine data
+    // Combine data.
     $allsubmissions = [];
     foreach ($assignments as $assignid => $assignment) {
         if (!report_assign\lib::allowed_to_view($assignid, $assignments)) {
