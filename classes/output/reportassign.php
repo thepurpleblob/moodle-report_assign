@@ -57,7 +57,7 @@ class reportassign implements renderable, templatable {
      * @return array
      */
     protected function get_profilefields() {
-        $fields = explode(',', get_config('report_assign', 'profilefields'));
+        $fields = array_filter(explode(',', get_config('report_assign', 'profilefields')));
         $profilefields = [];
         foreach ($fields as $field) {
             $profilefields[] = get_string($field);
