@@ -682,7 +682,7 @@ class lib {
                 $myxls->write_string($row, $i++, $s->workflow);
                 $myxls->write_string($row, $i++, $s->marker);
             }
-            $myxls->write_string($row, $i++, $s->grader);
+            $myxls->write_string($row, $i++, isset($s->grader) ? $s->grader : '-');
             $myxls->write_string($row, $i++, $s->modified);
             $myxls->write_string($row, $i++, $s->extensionduedate);
             $myxls->write_string($row, $i++, $s->files);
