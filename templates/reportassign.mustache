@@ -36,8 +36,10 @@
             <th>{{# str }}turnitin, report_assign{{/ str }}</th>
         {{/ turnitinenabled }}
         {{# assignment.markingallocation }}
+            <th>{{# str }}workflow, report_assign{{/ str }}</th>
             <th>{{# str }}allocatedmarker, report_assign{{/ str }}</th>
         {{/ assignment.markingallocation }}
+        <th>{{# str }}grader, report_assign{{/ str }}</th>
         <th>{{# str }}modified{{/ str }}</th>
         <th>{{# str }}extension, report_assign{{/ str }}</th>
         <th class="w-25">{{# str }}files{{/ str }}</th>
@@ -69,8 +71,10 @@
                     </td>
                 {{/ turnitinenabled }}
                 {{# assignment.markingallocation }}
-                    <td>{{ grader }}</td>
+                    <td>{{ workflow }}</td>
+                    <td>{{ marker }}</td>
                 {{/ assignment.markingallocation }}
+                <td>{{ grader }}</td>
                 <td>{{ modified }}</td>
                 <td>{{ extensionduedate }}</td>
                 <td class="w-25">{{ files }}</td>

@@ -435,6 +435,28 @@ class lib {
     }
 
     /**
+     * Get workflow info
+     * @param object $userflags
+     * @return array [workflow, marker]
+     */
+    private static function get_workflow($userflags) {
+        global $DB;
+
+        $workflow = '-';
+        $marker = '-';
+        if (!empty($userflags)) {
+            $workflow = empty($userflags->workflowstate) ? '-' : $userflags->workflowstate;
+            if ($userflags->allocatedmarker) {
+                if ($user = $DB->get_record('user', ['id' => $userflags->allocatedmarker])) {
+                    $marker = fullname($user);
+                }
+            }
+        }
+
+        return [$workflow, $marker];
+    }
+
+    /**
      * Add assignment data
      * @param int $assid
      * @param int $cmid
@@ -462,6 +484,7 @@ class lib {
         foreach ($submissions as $submission) {
             $userid = $submission->id;
             $userflags = $assign->get_user_flags($userid, false);
+            list($submission->workflow, $submission->marker) = self::get_workflow($userflags);
             if ($instance->teamsubmission) {
                 $usersubmission = $assign->get_group_submission($userid, 0, false);
             } else {
@@ -625,8 +648,10 @@ class lib {
             $myxls->write_string(3, $i++, get_string('turnitin', 'report_assign'));
         }
         if ($assignment->markingallocation) {
+            $myxls->write_string(3, $i++, get_string('workflow', 'report_assign'));
             $myxls->write_string(3, $i++, get_string('allocatedmarker', 'report_assign'));
         }
+        $myxls->write_string(3, $i++, get_string('grader', 'report_assign'));
         $myxls->write_string(3, $i++, get_string('modified'));
         $myxls->write_string(3, $i++, get_string('extension', 'report_assign'));
         $myxls->write_string(3, $i++, get_string('files'));
@@ -646,14 +671,18 @@ class lib {
             $myxls->write_string($row, $i++, $s->status);
             $myxls->write_string($row, $i++, html_entity_decode($s->grade));
             if ($urkundenabled) {
-                $myxls->write_string($row, $i++, $s->urkund->similarityscore);
+                $urkundscore = empty($s->urkund->similarityscore) ? '-' : $s->urkund->similarityscore;
+                $myxls->write_string($row, $i++, $urkundscore);
             }
             if ($turnitinenabled) {
-                $myxls->write_string($row, $i++, $s->turnitin->similarityscore);
+                $turnitinscore = empty($s->turnitin->similarityscore) ? '-' : $s->turnitin->similarityscore;
+                $myxls->write_string($row, $i++, $turnitinscore);
             }
             if ($assignment->markingallocation) {
-                $myxls->write_string($row, $i++, $s->grader);
+                $myxls->write_string($row, $i++, $s->workflow);
+                $myxls->write_string($row, $i++, $s->marker);
             }
+            $myxls->write_string($row, $i++, $s->grader);
             $myxls->write_string($row, $i++, $s->modified);
             $myxls->write_string($row, $i++, $s->extensionduedate);
             $myxls->write_string($row, $i++, $s->files);

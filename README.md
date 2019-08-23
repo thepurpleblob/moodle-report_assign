@@ -35,3 +35,4 @@ History
 * 1.2.0 - initial release
 * 1.2.2 - Adds 'extension date' and 'due date' (to 'export all'). Unused strings removed
 * 1.2.4 - Tested with versions 3.5 and 3.6
+* 1.2.4 - show marking workflow status
