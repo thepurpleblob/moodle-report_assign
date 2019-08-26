@@ -29,6 +29,8 @@ defined('MOODLE_INTERNAL') || die;
 
 define('FILENAME_SHORTEN', 30);
 
+//require_once($CFG->dirroot.'/mod/assign/locallib.php');
+
 use \assignfeedback_editpdf\document_services;
 use stdClass;
 
@@ -42,12 +44,22 @@ class lib {
     public static function get_assignments($id) {
         global $DB;
 
-        $assignments = $DB->get_records('assign', ['course' => $id]);
+        $course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
+        $modinfo = get_fast_modinfo($id);
+        if (empty($modinfo->instances['assign'])) {
+            return [];
+        }
+        $assigns = $modinfo->instances['assign'];
 
         // Add plagiarism and feedback status.
-        foreach ($assignments as $assid => $assignment) {
-            $assignment->urkundenabled = self::urkund_enabled($assid);
-            $assignment->turnitinenabled = self::turnitin_enabled($assid);
+        $assignments = [];
+        foreach ($assigns as $cm) {
+            $context = \context_module::instance($cm->id);
+            $assignment = new \assign($context, $cm, $course);
+            $instance = $assignment->get_instance();
+            $instance->urkundenabled = self::urkund_enabled($instance->id);
+            $instance->turnitinenabled = self::turnitin_enabled($instance->id);
+            $assignments[$instance->id] = $instance;
         }
 
         return $assignments;
@@ -682,7 +694,7 @@ class lib {
                 $myxls->write_string($row, $i++, $s->workflow);
                 $myxls->write_string($row, $i++, $s->marker);
             }
-            $myxls->write_string($row, $i++, isset($s->grader) ? $s->grader : '-');
+            $myxls->write_string($row, $i++, $s->grader);
             $myxls->write_string($row, $i++, $s->modified);
             $myxls->write_string($row, $i++, $s->extensionduedate);
             $myxls->write_string($row, $i++, $s->files);

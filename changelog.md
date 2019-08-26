@@ -13,3 +13,7 @@ No functional changes
 1.2.5
 Fixed bug where grader is shown instead of marker
 Show marking workflow, grader and marker in report 
+
+1.2.6
+Rewrote the way all Assignments are loaded
+Prevents error on assignment deletion
