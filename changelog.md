@@ -23,3 +23,6 @@ Improved display of buttons etc.
 Participant number is now always displayed for anonymous Assignments
 Option to add extensions directly from report
 Bug fixes
+
+Unreleased
+Changed "Username" to "Name" (for firstname lastname), allowing "Username" separately for the user login name.
