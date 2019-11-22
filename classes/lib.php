@@ -648,7 +648,7 @@ class lib {
         // Headers.
         $i = 0;
         $myxls->write_string(3, $i++, '#');
-        $myxls->write_string(3, $i++, get_string('username'));
+        $myxls->write_string(3, $i++, get_string('name'));
         foreach ($profilefields as $profilefield) {
             $myxls->write_string(3, $i++, get_string($profilefield));
         }
@@ -735,7 +735,7 @@ class lib {
         $i = 0;
         $myxls->write_string(1, $i++, '#');
         $myxls->write_string(1, $i++, get_string('assignmentname', 'report_assign'));
-        $myxls->write_string(1, $i++, get_string('username'));
+        $myxls->write_string(1, $i++, get_string('name'));
         foreach ($profilefields as $profilefield) {
             $myxls->write_string(1, $i++, get_string($profilefield));
         }
