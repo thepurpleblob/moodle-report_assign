@@ -624,7 +624,11 @@ class lib {
         require_once($CFG->dirroot.'/lib/excellib.class.php');
 
         // Profile fields.
-        $profilefields = explode(',', get_config('report_assign', 'profilefields'));
+        $profilefields = [];
+        $fields = get_config('report_assign', 'profilefields');
+        if ($fields != '') {
+            $profilefields = explode(',', $fields);
+        }
 
         // Group mode?
         $cm = get_coursemodule_from_instance('assign', $assignment->id);
