@@ -28,6 +28,20 @@ if ($hassiteconfig) {
 
     $settings = new admin_settingpage('report_assign_settings', new lang_string('pluginname', 'report_assign'));
 
+    // Selector for submission fields.
+    $submissionfields = [
+        "grade" => new lang_string('grade', 'report_assign'),
+    ];
+
+    $settings->add(new admin_setting_configmulticheckbox(
+            'report_assign/submissionfields',
+            new lang_string('submissionfields', 'report_assign'),
+            new lang_string('submissionfields_desc', 'report_assign'),
+            ["grade" => 1],
+            $submissionfields
+    ));
+
+    // Selector for user fields.
     $rawchoices = [
         'username',
         'email',
@@ -52,5 +66,4 @@ if ($hassiteconfig) {
         ['email' => 1, 'idnumber' => 1],
         $choices
     ));
-
 }

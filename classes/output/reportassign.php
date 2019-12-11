@@ -71,6 +71,7 @@ class reportassign implements renderable, templatable {
 
         // Group mode?
         $cm = get_coursemodule_from_instance('assign', $this->assignment->id);
+        $submissionfields = array_values(explode(',', get_config('report_assign', 'submissionfields')));
         $groupmode = $cm->groupmode;
         $groups = groups_get_all_groups($this->course->id);
         $profilefields = $this->get_profilefields();
@@ -85,6 +86,7 @@ class reportassign implements renderable, templatable {
             'enableplagiarism' => !empty($CFG->enableplagiarism),
             'turnitinenabled' => \report_assign\lib::turnitin_enabled($this->assignment->id),
             'urkundenabled' => \report_assign\lib::urkund_enabled($this->assignment->id),
+            'gradeenabled' => in_array('grade', $submissionfields),
             'groupselect' => $groupmode != 0,
             'groups' => array_values($groups),
             'profilefieldsenabled' => sizeof($profilefields),

@@ -28,7 +28,9 @@
             <th>{{# str }}groups{{/ str }}</th>
         {{/ groupselect }}
         <th>{{# str }}status{{/ str }}</th>
-        <th>{{# str }}grade{{/ str }}</th>
+        {{# gradeenabled }}
+            <th>{{# str }}grade{{/ str }}</th>
+        {{/ gradeenabled }}
         {{# urkundenabled }}
             <th>{{# str }}urkund, report_assign{{/ str }}</th>
         {{/ urkundenabled }}
@@ -57,7 +59,9 @@
                     <td>{{ groups }}</td>
                 {{/ groupselect }}
                 <td>{{ status }}</td>
-                <td>{{{ grade }}}</td>
+                {{# grade }}
+                    <td>{{{ . }}}</td>
+                {{/ grade }}
                 {{# urkundenabled }}
                     <td>
                         {{# urkund }}

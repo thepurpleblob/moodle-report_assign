@@ -51,6 +51,7 @@ class lib {
         }
         $assigns = $modinfo->instances['assign'];
 
+        $submissionfields = array_values(explode(',', get_config('report_assign', 'submissionfields')));
         // Add plagiarism and feedback status.
         $assignments = [];
         foreach ($assigns as $cm) {
@@ -59,6 +60,7 @@ class lib {
             $instance = $assignment->get_instance();
             $instance->urkundenabled = self::urkund_enabled($instance->id);
             $instance->turnitinenabled = self::turnitin_enabled($instance->id);
+            $instance->gradeenabled = in_array('grade', $submissionfields);
             $assignments[$instance->id] = $instance;
         }
 
@@ -490,6 +492,9 @@ class lib {
         // Feedbackplugins.
         $feedbackplugins = $assign->get_feedback_plugins();
 
+        // Submission fields.
+        $submissionfields = array_values(explode(',', get_config('report_assign', 'submissionfields')));
+
         // Profile fields.
         $profilefields = explode(',', get_config('report_assign', 'profilefields'));
 
@@ -515,13 +520,17 @@ class lib {
                 $grade = $assign->get_user_grade($userid, false);
                 $gradevalue = empty($grade) ? null : $grade->grade;
                 $displaygrade = $assign->display_grade($gradevalue, false, $userid);
-                $submission->grade = $displaygrade;
+                if (in_array('grade', $submissionfields)) {
+                    $submission->grade = $displaygrade;
+                }
                 $submission->grader = self::get_grader($grade);
             } else {
                 $submission->created = '-';
                 $submission->modified = '-';
                 $submission->status = '-';
-                $submission->grade = '-';
+                if (in_array('grade', $submissionfields)) {
+                    $submission->grade = '-';
+                }
             }
             list($submission->groups, $submission->groupids) = self::get_user_groups($userid, $courseid);
             $submission->urkund = self::get_urkund_score($assid, $cmid, $userid);
@@ -625,6 +634,8 @@ class lib {
 
         // Profile fields.
         $profilefields = [];
+        $submissionfields = get_config('report_assign', 'submissionfields');
+        $submissionfields = explode(',', $submissionfields);
         $fields = get_config('report_assign', 'profilefields');
         if ($fields != '') {
             $profilefields = explode(',', $fields);
@@ -656,7 +667,9 @@ class lib {
             $myxls->write_string(3, $i++, get_string('groups'));
         }
         $myxls->write_string(3, $i++, get_string('status'));
-        $myxls->write_string(3, $i++, get_string('grade'));
+        if (in_array('grade', $submissionfields)) {
+            $myxls->write_string(3, $i++, get_string('grade'));
+        }
         if ($urkundenabled = self::urkund_enabled($assignment->id)) {
             $myxls->write_string(3, $i++, get_string('urkund', 'report_assign'));
         }
@@ -685,7 +698,9 @@ class lib {
                 $myxls->write_string($row, $i++, $s->groups);
             }
             $myxls->write_string($row, $i++, $s->status);
-            $myxls->write_string($row, $i++, html_entity_decode($s->grade));
+            if(in_array('grade', $submissionfields)) {
+                $myxls->write_string($row, $i++, html_entity_decode($s->grade));
+            }
             if ($urkundenabled) {
                 $urkundscore = empty($s->urkund->similarityscore) ? '-' : $s->urkund->similarityscore;
                 $myxls->write_string($row, $i++, $urkundscore);
