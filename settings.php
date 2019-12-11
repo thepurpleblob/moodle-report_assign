@@ -48,7 +48,7 @@ if ($hassiteconfig) {
         'report_assign/profilefields',
         new lang_string('profilefields', 'report_assign'),
         new lang_string('profilefields_desc', 'report_assign'),
-        ['email', 'idnumber'],
+        ['email' => 1, 'idnumber' => 1],
         $choices
     ));
 
