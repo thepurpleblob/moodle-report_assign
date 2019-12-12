@@ -73,6 +73,7 @@ class reportassign implements renderable, templatable {
         $cm = get_coursemodule_from_instance('assign', $this->assignment->id);
         $groupmode = $cm->groupmode;
         $groups = groups_get_all_groups($this->course->id);
+        $profilefields = $this->get_profilefields();
 
         return [
             'canrevealnames' => has_capability('report/assign:shownames', $this->context) && $this->assignment->blindmarking,
@@ -86,7 +87,8 @@ class reportassign implements renderable, templatable {
             'urkundenabled' => \report_assign\lib::urkund_enabled($this->assignment->id),
             'groupselect' => $groupmode != 0,
             'groups' => array_values($groups),
-            'profilefields' => $this->get_profilefields(),
+            'profilefieldsenabled' => sizeof($profilefields),
+            'profilefields' => $profilefields,
         ];
     }
 

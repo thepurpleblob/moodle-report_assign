@@ -48,11 +48,11 @@
         {{# submissions }}
             <tr class="group_0 {{# groupids }}group_{{ . }} {{/ groupids}}">
                 <td>{{ fullname }}</td>
-                {{# profilefields }}
+                {{# profilefieldsenabled }}
                     {{# profiledata }}
                         <td>{{ . }}</td>
                     {{/ profiledata }}
-                {{/ profilefields }}
+                {{/ profilefieldsenabled }}
                 {{# groupselect }}
                     <td>{{ groups }}</td>
                 {{/ groupselect }}
