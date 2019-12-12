@@ -328,6 +328,19 @@ class lib {
     }
 
     /**
+     * Fix file/folder names
+     * Some characters aren't allowed in Windows
+     * @param string $path
+     * @return string
+     */
+    protected static function sanitise_filename($path) {
+        $bad = array_merge(
+            array_map('chr', range(0,31)),
+            array("<", ">", ":", '"', "\\", "|", "?", "*"));
+        return str_replace($bad, "_", $path);
+    } 
+
+    /**
      * Get feedback
      * @param object $assign
      * @param int $cmid
@@ -341,7 +354,7 @@ class lib {
         $zipfiles = [];
 
         // Don't make a tar-bomb.
-        $folder = trim(shorten_text($instance->name, 30));
+        $folder = self::sanitise_filename(trim(shorten_text($instance->name, 30)));
         $zipfiles[$folder] = null;
 
         foreach ($submissions as $submission) {
@@ -362,7 +375,7 @@ class lib {
             $fullname = $submission->fullname;
 
             // User directory constructed to guarantee uniqueness.
-            $userdir = "$folder/$fullname - $username";
+            $userdir = self::sanitise_filename("$folder/$fullname - $username");
 
             // Each user has a directory.
             $zipfiles[$userdir] = null;
