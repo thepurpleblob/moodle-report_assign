@@ -30,14 +30,20 @@ if ($hassiteconfig) {
 
     // Selector for submission fields.
     $submissionfields = [
-        "grade" => new lang_string('grade', 'report_assign'),
+        "status" => new lang_string('status'),
+        "grade" => new lang_string('grade'),
+        "grader" => new lang_string('grader', 'report_assign'),
+        "created" => new lang_string('created', 'report_assign'),
+        "modified" => new lang_string('modified'),
+        "files" => new lang_string('files'),
+        "extension" => new lang_string('extension', 'report_assign'),
     ];
 
     $settings->add(new admin_setting_configmulticheckbox(
             'report_assign/submissionfields',
             new lang_string('submissionfields', 'report_assign'),
             new lang_string('submissionfields_desc', 'report_assign'),
-            ["grade" => 1],
+            ["status" => 1, "grade" => 1, "grader" => 1, "modified" => 1, "files" => 1, "extension" => 1],
             $submissionfields
     ));
 
