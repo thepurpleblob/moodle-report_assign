@@ -531,7 +531,25 @@ class lib {
             $profilefields = explode(',', $profilefieldsstr);
         }
 
+        $context = $assign->get_context();
+        $canrevealnames = has_capability('report/assign:shownames', $context);
+
         foreach ($submissions as $submission) {
+            // Split participant # and real names into separate fields.
+            if ($instance->blindmarking) {
+                $n = strpos($submission->fullname, ' (');
+                $participantname = substr($submission->fullname, 0, $n);
+                if ($canrevealnames) {
+                    $submission->participantname = $participantname;
+                    $submission->fullname = substr($submission->fullname, $n+2, -1);
+                } else {
+                    $submission->participantname = $submission->fullname;
+                    $submission->fullname = '-';
+                }
+            } else {
+                $submission->participantname = '-'; // Needed for exportall().
+            }
+
             $submissiondata = [];
             $userid = $submission->id;
             $userflags = $assign->get_user_flags($userid, false);
@@ -708,6 +726,7 @@ class lib {
         $i = 0;
         $myxls->write_string(3, $i++, '#');
         $myxls->write_string(3, $i++, get_string('name'));
+        $myxls->write_string(3, $i++, get_string('participantname', 'report_assign'));
         foreach ($profilefields as $profilefield) {
             $myxls->write_string(3, $i++, get_string($profilefield));
         }
@@ -735,6 +754,7 @@ class lib {
             $i = 0;
             $myxls->write_number($row, $i++, $row);
             $myxls->write_string($row, $i++, $s->fullname);
+            $myxls->write_string($row, $i++, $s->participantname);
             foreach ($s->profiledata as $value) {
                 $myxls->write_string($row, $i++, $value);
             }
@@ -797,6 +817,7 @@ class lib {
         $myxls->write_string(1, $i++, '#');
         $myxls->write_string(1, $i++, get_string('assignmentname', 'report_assign'));
         $myxls->write_string(1, $i++, get_string('name'));
+        $myxls->write_string(1, $i++, get_string('participantname', 'report_assign'));
         foreach ($profilefields as $profilefield) {
             $myxls->write_string(1, $i++, get_string($profilefield));
         }
@@ -819,6 +840,7 @@ class lib {
             $myxls->write_number($row, $i++, $row);
             $myxls->write_string($row, $i++, $s->assignmentname);
             $myxls->write_string($row, $i++, $s->fullname);
+            $myxls->write_string($row, $i++, $s->participantname);
             foreach ($s->profiledata as $value) {
                 $myxls->write_string($row, $i++, $value);
             }

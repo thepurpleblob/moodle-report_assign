@@ -56,6 +56,7 @@ $string['noassignments'] = 'There are no assignments in this course';
 $string['nocapability'] = 'You do not have the required capabiltities to view this report';
 $string['notallowed'] = 'You do not have permission to view the selected activity';
 $string['plagiarism'] = 'Plagiarism';
+$string['participantname'] = 'Participant name';
 $string['pluginname'] = 'Assignment submission report';
 $string['privacy:metadata'] = 'The Assignment submission report only shows data stored in other locations.';
 $string['profilefields'] = 'Profile fields';

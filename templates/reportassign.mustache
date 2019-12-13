@@ -21,6 +21,7 @@
 <table class="table table-striped">
     <thead>
         <th>{{# str }}name{{/ str }}</th>
+        <th>{{# str }}participantname, report_assign{{/ str }}</th>
         {{# profilefields }}
             <th>{{{ . }}}</th>
         {{/ profilefields }}
@@ -45,6 +46,9 @@
         {{# submissions }}
             <tr class="group_0 {{# groupids }}group_{{ . }} {{/ groupids}}">
                 <td>{{ fullname }}</td>
+                {{# participantname }}
+                    <td>{{{ . }}}</td>
+                {{/ participantname }}
                 {{# profilefieldsenabled }}
                     {{# profiledata }}
                         <td>{{ . }}</td>
