@@ -32,6 +32,8 @@ if ($hassiteconfig) {
     $submissionfields = [
         "status" => new lang_string('status'),
         "grade" => new lang_string('grade'),
+        "gradevalue" => new lang_string('gradevalue', 'report_assign'),
+        "grademax" => new lang_string('grademax', 'report_assign'),
         "grader" => new lang_string('grader', 'report_assign'),
         "created" => new lang_string('created', 'report_assign'),
         "modified" => new lang_string('modified'),

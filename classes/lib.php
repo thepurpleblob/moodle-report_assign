@@ -560,6 +560,7 @@ class lib {
                 $usersubmission = $assign->get_user_submission($userid, false);
             }
             if ($usersubmission) {
+                $gradeitem = $assign->get_grade_item();
                 $grade = $assign->get_user_grade($userid, false);
                 $gradevalue = empty($grade) ? null : $grade->grade;
                 foreach ($submissionfields as $fieldid => $fieldstring) {
@@ -571,9 +572,22 @@ class lib {
                             $submissiondata[] = userdate($usersubmission->timemodified, $dateformat);
                             break;
                         case 'grade':
-                            $gradevalue = empty($grade) ? null : $grade->grade;
                             $displaygrade = $assign->display_grade($gradevalue, false, $userid);
                             $submissiondata[] = str_replace('&nbsp;', ' ', $displaygrade);
+                            break;
+                        case 'gradevalue':
+                            if (!empty($grade) && $grade->grade >= 0) {
+                                $gradevalue = $grade->grade;
+                            }
+                            if ($gradevalue == -1 || $gradevalue === null) {
+                                $gradevalue = '-';
+                            } else {
+                                $gradevalue = grade_format_gradevalue($grade->grade, $gradeitem);
+                            }
+                            $submissiondata[] = $gradevalue;
+                            break;
+                        case 'grademax':
+                            $submissiondata[] = grade_format_gradevalue($gradeitem->grademax, $gradeitem);
                             break;
                         case 'grader':
                             $submissiondata[] = self::get_grader($grade);
@@ -730,7 +744,6 @@ class lib {
         foreach ($profilefields as $profilefield) {
             $myxls->write_string(3, $i++, get_string($profilefield));
         }
-
         foreach ($submissionfields as $fieldid => $fieldstring) {
             $myxls->write_string(3, $i++, $fieldstring);
         }
