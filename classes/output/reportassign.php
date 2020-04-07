@@ -85,7 +85,8 @@ class reportassign implements renderable, templatable {
             'turnitinenabled' => \report_assign\lib::turnitin_enabled($this->assignment->id),
             'urkundenabled' => \report_assign\lib::urkund_enabled($this->assignment->id),
             'groupselect' => $groupmode != 0,
-            'groups' => array_values($groups),
+	    'groups' => array_values($groups),
+	    'showprofilefields' => !empty(get_config('report_assign', 'profilefields')),
             'profilefields' => $this->get_profilefields(),
         ];
     }

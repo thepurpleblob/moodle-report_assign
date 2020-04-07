@@ -17,7 +17,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>{{# str }}name{{/ str }}</th>
+                <th class="w-50">{{# str }}name{{/ str }}</th>
                 <th>{{# str }}status{{/ str }}</th>
                 <th>{{# str }}groupmode{{/ str }}</th>
                 {{# enableplagiarism }}
@@ -32,22 +32,29 @@
                     <td><a href="{{{ assignurl }}}"><i class="fa fa-external-link"></i></a> {{ name }}</td>
                     <td class="h5">
                         {{# blindmarking }}
-                            <span class="badge badge-secondary">{{# str }}blindmarkingon, report_assign{{/ str }}</span>
+                            <span class="badge badge-secondary w-100">{{# str }}blindmarkingon, report_assign{{/ str }}</span><br />
                         {{/ blindmarking }}
                         {{# revealidentities }}
-                            <span class="badge badge-success">{{# str }}revealidentities, report_assign{{/ str }}</span>
+                            <span class="badge badge-success w-100">{{# str }}revealidentities, report_assign{{/ str }}</span><br />
                         {{/ revealidentities }}
                         {{# markingworkflow }}
-                            <span class="badge badge-warning">{{# str }}workflowon, report_assign{{/ str }}</span>
+                            <span class="badge badge-warning w-100">{{# str }}workflowon, report_assign{{/ str }}</span><br />
                         {{/ markingworkflow }}
                         {{# markingallocation }}
-                            <span class="badge badge-primary">{{# str }}allocationon, report_assign{{/ str }}</span>
+                            <span class="badge badge-primary w-100">{{# str }}allocationon, report_assign{{/ str }}</span><br />
                         {{/ markingallocation }}
                         {{# groupsubmission }}
-                            <span class="badge badge-dark">{{# str }}groupsubmission, report_assign{{/ str }}</span>
+                            <span class="badge badge-dark w-100">{{# str }}groupsubmission, report_assign{{/ str }}</span>
                         {{/ groupsubmission }}
                     </td>
-                    <td>{{ groupmode }}</td>
+                    <td>
+                        {{# showgroupmode }}
+                            <span class="badge badge-danger w-100">{{ groupmode }}</span>
+                        {{/ showgroupmode }}
+                        {{^ showgroupmode }}
+                            -
+                        {{/ showgroupmode }}
+                    </td>
                     {{# enableplagiarism }}
                         <td>
                             {{# urkundenabled }}{{# pix }}urkund, report_assign, {{# str }}urkundenabled, report_assign{{/ str }}{{/ pix }}{{/ urkundenabled}}

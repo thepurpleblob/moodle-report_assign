@@ -42,17 +42,18 @@
         <th>{{# str }}grader, report_assign{{/ str }}</th>
         <th>{{# str }}modified{{/ str }}</th>
         <th>{{# str }}extension, report_assign{{/ str }}</th>
+        <th>{{# str }}feedback, report_assign{{/ str }}</th>
         <th class="w-25">{{# str }}files{{/ str }}</th>
     </thead>
     <tbody>
         {{# submissions }}
             <tr class="group_0 {{# groupids }}group_{{ . }} {{/ groupids}}">
-                <td>{{ fullname }}</td>
-                {{# profilefields }}
+                <td>{{ fullname }}</td> 
+                {{# showprofilefields }}
                     {{# profiledata }}
                         <td>{{ . }}</td>
                     {{/ profiledata }}
-                {{/ profilefields }}
+                {{/ showprofilefields }}
                 {{# groupselect }}
                     <td>{{ groups }}</td>
                 {{/ groupselect }}
@@ -76,9 +77,10 @@
                     <td>{{ workflow }}</td>
                     <td>{{ marker }}</td>
                 {{/ assignment.markingallocation }}
-                <td>{{ grader }}</td>
+                <td><a href="{{{ graderurl }}}">{{ grader }}</a></td>
                 <td>{{ modified }}</td>
                 <td>{{ extensionduedate }}</td>
+                <td>{{{ feedback }}}</td>
                 <td class="w-25">{{ files }}</td>
             </tr>
         {{/ submissions }}

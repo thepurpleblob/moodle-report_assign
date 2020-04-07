@@ -32,6 +32,7 @@ $string['assign:shownames'] = 'All (non-anonymised) view of submitters';
 $string['anonymousassignments'] = 'Assignments';
 $string['assignmentname'] = 'Assignment name';
 $string['blindmarkingon'] = 'Blind marking on';
+$string['confignotifications'] = 'Configure notifications';
 $string['created'] = 'Created';
 $string['duedate'] = 'Due date';
 $string['dumpfiles'] = 'Dump files';

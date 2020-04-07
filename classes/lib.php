@@ -28,6 +28,7 @@ namespace report_assign;
 defined('MOODLE_INTERNAL') || die;
 
 define('FILENAME_SHORTEN', 30);
+define('FEEDBACK_SHORTEN', 50);
 
 //require_once($CFG->dirroot.'/mod/assign/locallib.php');
 
@@ -248,16 +249,16 @@ class lib {
         global $DB;
 
         if (empty($grade)) {
-            return '-';
+            return ['-', null];
         }
 
         if ($grade->grader > 0) {
             if ($user = $DB->get_record('user', ['id' => $grade->grader])) {
-                return fullname($user);
+                return [fullname($user), new \moodle_url('/user/profile.php', ['id' => $user->id])];
             }
         }
 
-        return '-';
+        return ['-', null];
     }
 
     /**
@@ -292,7 +293,7 @@ class lib {
             } else {
                 $profiledata[] = '-';
             }
-        }
+	}
 
         return $profiledata;
     }
@@ -482,6 +483,28 @@ class lib {
     }
 
     /**
+     * Get feedback text (if any)
+     * @param assign $assign
+     * @param object $grade
+     * @return string
+     */
+    protected static function get_feedback($assign, $grade) {
+        if (!$grade) {
+            return '-';
+        }
+        $plugin = $assign->get_feedback_plugin_by_type('comments');
+        $text = $plugin->text_for_gradebook($grade);
+        $format = $plugin->format_for_gradebook($grade);
+        if ($text) {
+            $formattedtext = format_text(shorten_text($text, FEEDBACK_SHORTEN), $format);
+            
+            return $formattedtext;
+        } else {
+            return '-';
+        }
+    }
+
+    /**
      * Add assignment data
      * @param int $assid
      * @param int $cmid
@@ -503,8 +526,9 @@ class lib {
         // Feedbackplugins.
         $feedbackplugins = $assign->get_feedback_plugins();
 
-        // Profile fields.
-        $profilefields = explode(',', get_config('report_assign', 'profilefields'));
+	// Profile fields.
+	$profilecfg = get_config('report_assign', 'profilefields');
+	$profilefields = empty($profilecfg) ? [] : explode(',', $profilecfg);
 
         foreach ($submissions as $submission) {
             $userid = $submission->id;
@@ -529,18 +553,23 @@ class lib {
                 $gradevalue = empty($grade) ? null : $grade->grade;
                 $displaygrade = $assign->display_grade($gradevalue, false, $userid);
                 $submission->grade = $displaygrade;
-                $submission->grader = self::get_grader($grade);
+                list(
+                    $submission->grader,
+                    $submission->graderurl
+                ) = self::get_grader($grade);
+                $submission->feedback = self::get_feedback($assign, $grade);
             } else {
                 $submission->created = '-';
                 $submission->modified = '-';
                 $submission->status = '-';
                 $submission->grade = '-';
+                $submission->feedback = '-';
             }
             list($submission->groups, $submission->groupids) = self::get_user_groups($userid, $courseid);
             $submission->urkund = self::get_urkund_score($assid, $cmid, $userid);
             $submission->turnitin = self::get_turnitin_score($assid, $cmid, $userid);
             $submission->files = self::get_submission_files($assign, $filesubmission, $usersubmission, $userid);
-            $submission->profiledata = self::get_profile_data($profilefields, $submission);
+	    $submission->profiledata = self::get_profile_data($profilefields, $submission);
 
             // User fields.
             $profilefields = explode(',', get_config('report_assign', 'profilefields'));
@@ -683,6 +712,7 @@ class lib {
         $myxls->write_string(3, $i++, get_string('grader', 'report_assign'));
         $myxls->write_string(3, $i++, get_string('modified'));
         $myxls->write_string(3, $i++, get_string('extension', 'report_assign'));
+        $myxls->write_string(3, $i++, get_string('feedback', 'report_assign'));
         $myxls->write_string(3, $i++, get_string('files'));
 
         // Add some data.
@@ -714,6 +744,7 @@ class lib {
             $myxls->write_string($row, $i++, $s->grader);
             $myxls->write_string($row, $i++, $s->modified);
             $myxls->write_string($row, $i++, $s->extensionduedate);
+            $myxls->write_string($row, $i++, $s->feedback);
             $myxls->write_string($row, $i++, $s->files);
             $row++;
         }
