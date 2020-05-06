@@ -21,6 +21,9 @@
 <table class="table table-striped">
     <thead>
         <th>{{# str }}username{{/ str }}</th>
+        {{# blindmarking }}
+            <th>{{# str }}participantno, report_assign{{/ str }}</th>
+        {{/ blindmarking }}
         {{# profilefields }}
             <th>{{{ . }}}</th>
         {{/ profilefields }}
@@ -42,18 +45,20 @@
         <th>{{# str }}grader, report_assign{{/ str }}</th>
         <th>{{# str }}modified{{/ str }}</th>
         <th>{{# str }}extension, report_assign{{/ str }}</th>
-        <th>{{# str }}feedback, report_assign{{/ str }}</th>
         <th class="w-25">{{# str }}files{{/ str }}</th>
     </thead>
     <tbody>
         {{# submissions }}
             <tr class="group_0 {{# groupids }}group_{{ . }} {{/ groupids}}">
-                <td>{{ fullname }}</td> 
-                {{# showprofilefields }}
+                <td>{{ fullname }}</td>
+                {{# blindmarking }}
+                    <td>{{ participantno }}</td>
+                {{/ blindmarking }}
+                {{# profilefields }}
                     {{# profiledata }}
                         <td>{{ . }}</td>
                     {{/ profiledata }}
-                {{/ showprofilefields }}
+                {{/ profilefields }}
                 {{# groupselect }}
                     <td>{{ groups }}</td>
                 {{/ groupselect }}
@@ -77,10 +82,9 @@
                     <td>{{ workflow }}</td>
                     <td>{{ marker }}</td>
                 {{/ assignment.markingallocation }}
-                <td><a href="{{{ graderurl }}}">{{ grader }}</a></td>
+                <td>{{ grader }}</td>
                 <td>{{ modified }}</td>
                 <td>{{ extensionduedate }}</td>
-                <td>{{{ feedback }}}</td>
                 <td class="w-25">{{ files }}</td>
             </tr>
         {{/ submissions }}

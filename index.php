@@ -73,6 +73,7 @@ if ($exportall) {
     // Combine data.
     $allsubmissions = [];
     foreach ($assignments as $assignid => $assignment) {
+        set_time_limit(60);
         if (!report_assign\lib::allowed_to_view($assignid, $assignments)) {
             continue;
         }
@@ -158,7 +159,8 @@ if ($assignid) {
     }
 
     // Display report.
-    $reportassign = new report_assign\output\reportassign($course, $context, $fullurl, $submissions, $assignment);
+    $showparticipantnumber = $assignment->blindmarking && !$assign->is_blind_marking();
+    $reportassign = new report_assign\output\reportassign($course, $context, $fullurl, $submissions, $assignment, $showparticipantnumber);
     echo $output->render_reportassign($reportassign);
 
     // Trigger an assignment viewed event.

@@ -44,12 +44,15 @@ class reportassign implements renderable, templatable {
 
     protected $assignment;
 
-    public function __construct($course, $context, $fullurl, $submissions, $assignment) {
+    protected $showparticipantnumber;
+
+    public function __construct($course, $context, $fullurl, $submissions, $assignment, $showparticipantnumber) {
         $this->course = $course;
         $this->context = $context;
         $this->fullurl = $fullurl;
         $this->submissions = $submissions;
         $this->assignment = $assignment;
+        $this->showparticipantnumber = $showparticipantnumber;
     }
 
     /**
@@ -85,9 +88,9 @@ class reportassign implements renderable, templatable {
             'turnitinenabled' => \report_assign\lib::turnitin_enabled($this->assignment->id),
             'urkundenabled' => \report_assign\lib::urkund_enabled($this->assignment->id),
             'groupselect' => $groupmode != 0,
-	    'groups' => array_values($groups),
-	    'showprofilefields' => !empty(get_config('report_assign', 'profilefields')),
+            'groups' => array_values($groups),
             'profilefields' => $this->get_profilefields(),
+            'blindmarking' => $this->assignment->blindmarking,
         ];
     }
 
