@@ -17,3 +17,9 @@ Show marking workflow, grader and marker in report
 1.2.6
 Rewrote the way all Assignments are loaded
 Prevents error on assignment deletion
+
+1.2.7
+Improved display of buttons etc.
+Participant number is now always displayed for anonymous Assignments
+Option to add extensions directly from report
+Bug fixes

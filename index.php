@@ -96,11 +96,11 @@ if ($exportall) {
 // Has a link been submitted?
 if ($assignid) {
 
-    // Filters.
-    $PAGE->requires->js_call_amd('report_assign/filter', 'init');
-
     // Create assignment object.
     $assign = \report_assign\lib::get_assign($course, $assignid);
+
+    // Javascript
+    $PAGE->requires->js_call_amd('report_assign/filter', 'init', [$assign->get_instance()->duedate]);
 
     // Participants.
     $submissions = $assign->list_participants_with_filter_status_and_group($group);
@@ -160,7 +160,8 @@ if ($assignid) {
 
     // Display report.
     $showparticipantnumber = $assignment->blindmarking && !$assign->is_blind_marking();
-    $reportassign = new report_assign\output\reportassign($course, $context, $fullurl, $submissions, $assignment, $showparticipantnumber);
+    $extensionsok = report_assign\lib::is_extension_allowed($assign);
+    $reportassign = new report_assign\output\reportassign($course, $context, $fullurl, $submissions, $assignment, $showparticipantnumber, $extensionsok);
     echo $output->render_reportassign($reportassign);
 
     // Trigger an assignment viewed event.

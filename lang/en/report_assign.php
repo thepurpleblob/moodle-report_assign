@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['addextension'] = 'Add extension';
 $string['allocatedmarker'] = 'Marker';
 $string['allocationon'] = 'Allocation enabled';
 $string['annotatedpdfs'] = 'Annotated PDFs';
@@ -44,6 +45,8 @@ $string['eventreportviewed'] = 'Assignment report viewed';
 $string['export'] = 'Export';
 $string['exportall'] = 'Export all';
 $string['extension'] = 'Extension';
+$string['extensionpopuptitle'] = 'Set extension';
+$string['extensionhelp'] = 'Extend/add extension to due date for "{$a}" in full days';
 $string['feedback'] = 'Feedback';
 $string['feedbackcomments'] = 'Feedback comments';
 $string['feedbackfiles'] = 'Feedback files';

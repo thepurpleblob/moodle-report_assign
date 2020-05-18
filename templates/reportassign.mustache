@@ -84,7 +84,13 @@
                 {{/ assignment.markingallocation }}
                 <td>{{ grader }}</td>
                 <td>{{ modified }}</td>
-                <td>{{ extensionduedate }}</td>
+                <td><span id="extensionuser_{{ userid }}">{{ extensionduedate }}</span>
+                    {{# extensionsok }}
+                        <a href="#" class="doextension" data-assignmentid="{{ assignmentid }}" data-userid="{{ userid }}" data-fullname="{{ fullname }}" title="{{# str }}addextension, report_assign{{/ str }}">
+                            <i class="fa fa-cog"></i>
+                        </a>
+                    {{/ extensionsok}}
+                </td>
                 <td class="w-25">{{ files }}</td>
             </tr>
         {{/ submissions }}

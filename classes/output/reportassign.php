@@ -46,13 +46,16 @@ class reportassign implements renderable, templatable {
 
     protected $showparticipantnumber;
 
-    public function __construct($course, $context, $fullurl, $submissions, $assignment, $showparticipantnumber) {
+    protected $extensionsok;
+
+    public function __construct($course, $context, $fullurl, $submissions, $assignment, $showparticipantnumber, $extensionsok) {
         $this->course = $course;
         $this->context = $context;
         $this->fullurl = $fullurl;
         $this->submissions = $submissions;
         $this->assignment = $assignment;
         $this->showparticipantnumber = $showparticipantnumber;
+        $this->extensionsok = $extensionsok;
     }
 
     /**
@@ -91,6 +94,7 @@ class reportassign implements renderable, templatable {
             'groups' => array_values($groups),
             'profilefields' => $this->get_profilefields(),
             'blindmarking' => $this->assignment->blindmarking,
+            'extensionsok' => $this->extensionsok,
         ];
     }
 
