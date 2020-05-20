@@ -515,7 +515,8 @@ class lib {
         $feedbackplugins = $assign->get_feedback_plugins();
 
         // Profile fields.
-        $profilefields = explode(',', get_config('report_assign', 'profilefields'));
+        $profileconfig = trim(get_config('report_assign', 'profilefields'));
+        $profilefields = empty($profileconfig) ? [] : explode(',', $profileconfig);
 
         foreach ($submissions as $submission) {
             $userid = $submission->id;
@@ -556,6 +557,7 @@ class lib {
             $submission->turnitin = self::get_turnitin_score($assid, $cmid, $userid);
             $submission->files = self::get_submission_files($assign, $filesubmission, $usersubmission, $userid);
             $submission->profiledata = self::get_profile_data($profilefields, $submission);
+            $submission->isprofiledata = count($profilefields) != 0;
 
             // User fields.
             $profilefields = explode(',', get_config('report_assign', 'profilefields'));
