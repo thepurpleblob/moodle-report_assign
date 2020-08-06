@@ -52,4 +52,20 @@ if ($hassiteconfig) {
         $choices
     ));
 
+    // Selector for field options.
+    $rawchoices = [
+        'splitusername',
+    ];
+    $choices = [];
+    foreach ($rawchoices as $choice) {
+        $choices[$choice] = new lang_string($choice, 'report_assign');
+    }
+
+    $settings->add(new admin_setting_configmulticheckbox(
+        'report_assign/fieldoptions',
+        new lang_string('fieldoptions', 'report_assign'),
+        new lang_string('fieldoptions_desc', 'report_assign'),
+        [],
+        $choices
+    ));
 }

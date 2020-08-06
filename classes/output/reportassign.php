@@ -80,6 +80,8 @@ class reportassign implements renderable, templatable {
         $groupmode = $cm->groupmode;
         $groups = groups_get_all_groups($this->course->id);
 
+        $fieldoptions = \report_assign\lib::get_field_options();
+
         return [
             'canrevealnames' => has_capability('report/assign:shownames', $this->context) && $this->assignment->blindmarking,
             'canexport' => has_capability('report/assign:export', $this->context),
@@ -95,6 +97,7 @@ class reportassign implements renderable, templatable {
             'profilefields' => $this->get_profilefields(),
             'blindmarking' => $this->assignment->blindmarking,
             'extensionsok' => $this->extensionsok,
+            'fieldoptions' => $fieldoptions,
         ];
     }
 
