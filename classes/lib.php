@@ -83,6 +83,28 @@ class lib {
     }
 
     /**
+     * Get field options pref.
+     * @return array
+     */
+    public static function get_field_options() {
+        $opts = get_config('report_assign', 'fieldoptions');
+        if (empty($opts)) {
+            return;
+        }
+        if (strrpos($opts, ",") === false) {
+            $fieldoptions = [$opts => 1];
+        } else {
+            $opts = array_filter(explode(',', $opts));
+            $fieldoptions = [];
+            foreach ($opts as $opt) {
+                $fieldoptions[$opt] = 1;
+            }
+        }
+
+        return $fieldoptions;
+    }
+
+    /**
      * Get the group(s) a user is a member of
      * @param int $userid
      * @param int $courseid
@@ -675,6 +697,10 @@ class lib {
             $profilefields = explode(',', $fields);
         }
 
+        // Field options pref.
+        $fieldoptions = self::get_field_options();
+        $splitusername = !empty($fieldoptions['splitusername']);
+
         // Group mode?
         $cm = get_coursemodule_from_instance('assign', $assignment->id);
         $groupmode = $cm->groupmode;
@@ -693,7 +719,12 @@ class lib {
         // Headers.
         $i = 0;
         $myxls->write_string(3, $i++, '#');
-        $myxls->write_string(3, $i++, get_string('name'));
+        if ($splitusername) {
+            $myxls->write_string(3, $i++, get_string('firstname'));
+            $myxls->write_string(3, $i++, get_string('lastname'));
+        } else {
+            $myxls->write_string(3, $i++, get_string('name'));
+        }
         $myxls->write_string(3, $i++, get_string('participantno', 'report_assign'));
         foreach ($profilefields as $profilefield) {
             $myxls->write_string(3, $i++, get_string($profilefield));
@@ -725,7 +756,12 @@ class lib {
         foreach ($submissions as $s) {
             $i = 0;
             $myxls->write_number($row, $i++, $linecount++);
-            $myxls->write_string($row, $i++, $s->fullname);
+            if ($splitusername) {
+                $myxls->write_string($row, $i++, $s->firstname);
+                $myxls->write_string($row, $i++, $s->lastname);
+            } else {
+                $myxls->write_string($row, $i++, $s->fullname);
+            }
             $myxls->write_string($row, $i++, $s->participantno);
             if ($fields != '') {
                 foreach ($s->profiledata as $value) {
@@ -772,6 +808,10 @@ class lib {
         $fields = get_config('report_assign', 'profilefields');
         $profilefields = explode(',', $fields);
 
+        // Field options pref.
+        $fieldoptions = self::get_field_options();
+        $splitusername = !empty($fieldoptions['splitusername']);
+
         // Plagiarism plugins?
         $isturnitin = !empty(\core_plugin_manager::instance()->get_plugin_info('plagiarism_turnitin'));
         $isurkund = !empty(\core_plugin_manager::instance()->get_plugin_info('plagiarism_urkund'));
@@ -788,7 +828,12 @@ class lib {
         $i = 0;
         $myxls->write_string(1, $i++, '#');
         $myxls->write_string(1, $i++, get_string('assignmentname', 'report_assign'));
-        $myxls->write_string(1, $i++, get_string('name'));
+        if ($splitusername) {
+            $myxls->write_string(1, $i++, get_string('firstname'));
+            $myxls->write_string(1, $i++, get_string('lastname'));
+        } else {
+            $myxls->write_string(1, $i++, get_string('name'));
+        }
         $myxls->write_string(1, $i++, get_string('participantno', 'report_assign'));
         if ($fields != '') {
             foreach ($profilefields as $profilefield) {
@@ -817,7 +862,12 @@ class lib {
             $i = 0;
             $myxls->write_number($row, $i++, $linecount++);
             $myxls->write_string($row, $i++, $s->assignmentname);
-            $myxls->write_string($row, $i++, $s->fullname);
+            if ($splitusername) {
+                $myxls->write_string($row, $i++, $s->firstname);
+                $myxls->write_string($row, $i++, $s->lastname);
+            } else {
+                $myxls->write_string($row, $i++, $s->fullname);
+            }
             $myxls->write_string($row, $i++, $s->participantno);
             if ($fields != '') {
                 foreach ($s->profiledata as $value) {

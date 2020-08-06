@@ -20,7 +20,13 @@
 
 <table class="table table-striped">
     <thead>
-        <th>{{# str }}name{{/ str }}</th>
+        {{# fieldoptions.splitusername }}
+            <th>{{# str }}firstname{{/ str }}</th>
+            <th>{{# str }}lastname{{/ str }}</th>
+        {{/ fieldoptions.splitusername }}
+        {{^ fieldoptions.splitusername }}
+            <th>{{# str }}name{{/ str }}</th>
+        {{/ fieldoptions.splitusername }}
         {{# blindmarking }}
             <th>{{# str }}participantno, report_assign{{/ str }}</th>
         {{/ blindmarking }}
@@ -52,7 +58,13 @@
     <tbody>
         {{# submissions }}
             <tr class="group_0 {{# groupids }}group_{{ . }} {{/ groupids}}">
-                <td>{{ fullname }}</td>
+                {{# fieldoptions.splitusername }}
+                    <td>{{ firstname }}</td>
+                    <td>{{ lastname }}</td>
+                {{/ fieldoptions.splitusername }}
+                {{^ fieldoptions.splitusername }}
+                    <td>{{ fullname }}</td>
+                {{/ fieldoptions.splitusername }}
                 {{# blindmarking }}
                     <td>{{ participantno }}</td>
                 {{/ blindmarking }}
