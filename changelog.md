@@ -12,7 +12,7 @@ No functional changes
 
 1.2.5
 Fixed bug where grader is shown instead of marker
-Show marking workflow, grader and marker in report 
+Show marking workflow, grader and marker in report
 
 1.2.6
 Rewrote the way all Assignments are loaded
@@ -23,3 +23,13 @@ Improved display of buttons etc.
 Participant number is now always displayed for anonymous Assignments
 Option to add extensions directly from report
 Bug fixes
+
+Unreleased
+Changed "Username" to "Name" (for firstname lastname).
+Added option of splitting name into separate columns for first and last names.
+Added "Username" option to Profile field options (for login name).
+Converted submission fields to a preference, adding options for:
+ - grade value and maximum grade in separate columns.
+ - submission creation date
+ - submission lateness (including extensions)
+NB: This has changed the field order in the columns.
