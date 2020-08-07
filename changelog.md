@@ -27,3 +27,4 @@ Bug fixes
 Unreleased
 Changed "Username" to "Name" (for firstname lastname), allowing "Username" separately for the user login name.
 Added option of splitting name into separate columns for first and last names.
+Added "Username" option to Profile field options (for login name).
