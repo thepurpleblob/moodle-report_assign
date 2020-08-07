@@ -28,3 +28,8 @@ Unreleased
 Changed "Username" to "Name" (for firstname lastname), allowing "Username" separately for the user login name.
 Added option of splitting name into separate columns for first and last names.
 Added "Username" option to Profile field options (for login name).
+Converted submission fields to a preference, adding options for:
+ - grade value and maximum grade in separate columns.
+ - submission creation date
+ - submission lateness (including extensions)
+NB: This has changed the field order in the columns.

@@ -53,6 +53,28 @@ if ($hassiteconfig) {
         $choices
     ));
 
+    // Selector for submission fields.
+    $submissionfields = [
+        "status" => new lang_string('status'),
+        "grade" => new lang_string('grade'),
+        "gradevalue" => new lang_string('gradevalue', 'report_assign'),
+        "grademax" => new lang_string('grademax', 'report_assign'),
+        "grader" => new lang_string('grader', 'report_assign'),
+        "created" => new lang_string('created', 'report_assign'),
+        "modified" => new lang_string('modified'),
+        "latenessincext" => new lang_string('latenessincext', 'report_assign'),
+        "released" => new lang_string('released', 'report_assign'),
+        "extension" => new lang_string('extension', 'report_assign'),
+    ];
+
+    $settings->add(new admin_setting_configmulticheckbox(
+            'report_assign/submissionfields',
+            new lang_string('submissionfields', 'report_assign'),
+            new lang_string('submissionfields_desc', 'report_assign'),
+            ["status" => 1, "grade" => 1, "grader" => 1, "modified" => 1, "extension" => 1],
+            $submissionfields
+    ));
+
     // Selector for field options.
     $rawchoices = [
         'splitusername',

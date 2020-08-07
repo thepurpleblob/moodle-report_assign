@@ -33,11 +33,12 @@
         {{# profilefields }}
             <th>{{{ . }}}</th>
         {{/ profilefields }}
+        {{# submissionfields }}
+            <th>{{{ . }}}</th>
+        {{/ submissionfields }}
         {{# groupselect }}
             <th>{{# str }}groups{{/ str }}</th>
         {{/ groupselect }}
-        <th>{{# str }}status{{/ str }}</th>
-        <th>{{# str }}grade, report_assign{{/ str }}</th>
         {{# urkundenabled }}
             <th>{{# str }}urkund, report_assign{{/ str }}</th>
         {{/ urkundenabled }}
@@ -48,10 +49,6 @@
             <th>{{# str }}workflow, report_assign{{/ str }}</th>
             <th>{{# str }}allocatedmarker, report_assign{{/ str }}</th>
         {{/ assignment.markingallocation }}
-        <th>{{# str }}grader, report_assign{{/ str }}</th>
-        <th>{{# str }}modified{{/ str }}</th>
-        <th>{{# str }}released, report_assign{{/ str }}</th>
-        <th>{{# str }}extension, report_assign{{/ str }}</th>
         <th class="w-25">{{# str }}files{{/ str }}</th>
         <th>&nbsp;</th>
     </thead>
@@ -76,8 +73,20 @@
                 {{# groupselect }}
                     <td>{{ groups }}</td>
                 {{/ groupselect }}
-                <td>{{ status }}</td>
-                <td>{{{ grade }}}</td>
+                {{# submissionfieldsenabled }}
+                    {{# submissiondata }}
+                        <td>{{ . }}</td>
+                    {{/ submissiondata }}
+                    {{# extensionduedate }}
+                        <td><span id="extensionuser_{{ userid }}">{{ extensionduedate }}</span>
+                            {{# extensionsok }}
+                                <a href="#" class="doextension" data-assignmentid="{{ assignmentid }}" data-userid="{{ userid }}" data-fullname="{{ fullname }}" title="{{# str }}addextension, report_assign{{/ str }}">
+                                    <i class="fa fa-cog"></i>
+                                </a>
+                            {{/ extensionsok}}
+                        </td>
+                    {{/ extensionduedate }}
+                {{/ submissionfieldsenabled }}
                 {{# urkundenabled }}
                     <td>
                         {{# urkund }}
@@ -96,16 +105,6 @@
                     <td>{{ workflow }}</td>
                     <td>{{ marker }}</td>
                 {{/ assignment.markingallocation }}
-                <td>{{ grader }}</td>
-                <td>{{ modified }}</td>
-                <td>{{ released }}</td>
-                <td><span id="extensionuser_{{ userid }}">{{ extensionduedate }}</span>
-                    {{# extensionsok }}
-                        <a href="#" class="doextension" data-assignmentid="{{ assignmentid }}" data-userid="{{ userid }}" data-fullname="{{ fullname }}" title="{{# str }}addextension, report_assign{{/ str }}">
-                            <i class="fa fa-cog"></i>
-                        </a>
-                    {{/ extensionsok}}
-                </td>
                 <td class="w-25">{{ files }}</td>
                 <td><a class="btn btn-info btn-sm" href="{{{ loglink }}}">{{# str }}log, report_assign{{/ str }}</a></td>
             </tr>
