@@ -66,6 +66,47 @@ class lib {
     }
 
     /**
+     * Get field choices from submissionfields pref.
+     * @return array
+     */
+    public static function get_config_submissionfields() {
+        $fields = [];
+        $configstr = get_config('report_assign', 'submissionfields');
+
+        if ($configstr != '') {
+            $fields = explode(',', $configstr);
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Get field choices from submissionfields pref, with strings.
+     * @return array
+     */
+    public static function get_config_submissionfields_strings() {
+        $fieldsandstrings = [];
+        $configfields = self::get_config_submissionfields();
+
+        foreach ($configfields as $field) {
+            switch ($field) {
+                case 'grademax':
+                case 'gradevalue':
+                case 'grader':
+                case 'created':
+                case 'extension':
+                case 'latenessincext':
+                    $fieldsandstrings[$field] = get_string($field, 'report_assign');
+                    break;
+                default:
+                    $fieldsandstrings[$field] = get_string($field);
+            }
+        }
+
+        return $fieldsandstrings;
+    }
+
+    /**
      * can the user view the data submitted
      * some checks
      * @param int $assignid assignment id
@@ -183,6 +224,97 @@ class lib {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Get submission data.
+     * @param object $assign
+     * @param object $submission
+     * @param object $instance
+     * @param object $usersubmission
+     * @param object $userflags
+     * @param string $dateformat
+     * @return mixed
+     */
+    public static function get_submission_data(
+            $assign, $submission, $instance, $usersubmission, $userflags, $dateformat
+    ) {
+        $submissiondata = [];
+        $submissionfields = self::get_config_submissionfields_strings();
+
+        if ($usersubmission) {
+            $userid = $submission->id;
+
+            $gradeitem = $assign->get_grade_item();
+            $grade = $assign->get_user_grade($userid, false);
+            $gradevalue = empty($grade) ? null : $grade->grade;
+
+            foreach ($submissionfields as $fieldid => $fieldstring) {
+                switch ($fieldid) {
+                    case 'created':
+                        $submissiondata['created'] = userdate($usersubmission->timecreated, $dateformat);
+                        break;
+                    case 'modified':
+                        $submissiondata['modified'] = userdate($usersubmission->timemodified, $dateformat);
+                        break;
+                    case 'grade':
+                        $displaygrade = $assign->display_grade($gradevalue, false, $userid);
+                        $submissiondata['grade'] = str_replace('&nbsp;', ' ', $displaygrade);
+                        break;
+                    case 'gradevalue':
+                        if (!empty($grade) && $grade->grade >= 0) {
+                            $gradevalue = $grade->grade;
+                        }
+                        if ($gradevalue == -1 || $gradevalue === null) {
+                            $gradevalue = '-';
+                        } else {
+                            $gradevalue = grade_format_gradevalue($grade->grade, $gradeitem);
+                        }
+                        $submissiondata['gradevalue'] = $gradevalue;
+                        break;
+                    case 'grademax':
+                        $submissiondata['grademax'] = grade_format_gradevalue($gradeitem->grademax, $gradeitem);
+                        break;
+                    case 'grader':
+                        $submissiondata['grader'] = self::get_grader($grade);
+                        break;
+                    case 'latenessincext':
+                        $timesubmitted = $usersubmission->timemodified;
+                        if ($submission->grantedextension && !empty($userflags)) {
+                            $due = $userflags->extensionduedate;
+                        } else {
+                            $due = $instance->duedate;
+                        }
+                        if ($due && $timesubmitted > $due
+                            && $usersubmission->status != ASSIGN_SUBMISSION_STATUS_NEW) {
+                            $usertime = format_time($timesubmitted - $due);
+                            $latemessage = get_string('submittedlateshort', 'assign',  $usertime);
+                            $submissiondata['latenessincext'] = $latemessage;
+                        } else {
+                            $submissiondata['latenessincext'] = '-';
+                        }
+                        break;
+                    case 'extension':
+                        // Skip; extension is handled directly in add_assignment_data().
+                        break;
+                    default:
+                        if (isset($usersubmission->$fieldid)) {
+                            $submissiondata[$fieldid] = $usersubmission->$fieldid;
+                        } else {
+                            $submissiondata[$fieldid] = self::placeholder($fieldid);
+                        }
+                }
+            }
+        } else {
+            foreach ($submissionfields as $fieldid => $fieldstring) {
+                if ($fieldid != 'extension') {
+                    // Skip extension, which is handled directly in add_assignment_data().
+                    $submissiondata[$fieldid] = '-';
+                }
+            }
+        }
+
+        return $submissiondata;
     }
 
     /**
@@ -527,6 +659,9 @@ class lib {
         // Report date format.
         $dateformat = get_string('strftimedatetimeshort', 'langconfig');
 
+        // Submission fields selected in preferences.
+        $submissionfields = self::get_config_submissionfields();
+
         // Get sub plugins.
         $filesubmission = self::get_submission_plugin_files($assign);
 
@@ -551,27 +686,12 @@ class lib {
             } else {
                 $usersubmission = $assign->get_user_submission($userid, false);
             }
-            if ($submission->grantedextension && !empty($userflags)) {
-                $submission->extensionduedate = userdate($userflags->extensionduedate, $dateformat);
-            } else {
-                $submission->extensionduedate = '-';
-            }
-            if ($usersubmission) {
-                $submission->created = userdate($usersubmission->timecreated, $dateformat);
-                $submission->modified = userdate($usersubmission->timemodified, $dateformat);
-                $submission->status = $usersubmission->status;
-                $submissionid = $usersubmission->id;
-                $grade = $assign->get_user_grade($userid, false);
-                $gradevalue = empty($grade) ? null : $grade->grade;
-                $displaygrade = $assign->display_grade($gradevalue, false, $userid);
-                $submission->grade = $displaygrade;
-                $submission->grader = self::get_grader($grade);
-            } else {
-                $submission->created = '-';
-                $submission->modified = '-';
-                $submission->status = '-';
-                $submission->grade = '-';
-                $submission->grader = '-';
+            if (in_array('extension', $submissionfields)) {
+                if ($submission->grantedextension && !empty($userflags)) {
+                    $submission->extensionduedate = userdate($userflags->extensionduedate, $dateformat);
+                } else {
+                    $submission->extensionduedate = '-';
+                }
             }
             $submission->participantno = empty($submission->recordid) ? '-' : $submission->recordid;
             list($submission->groups, $submission->groupids) = self::get_user_groups($userid, $courseid);
@@ -580,6 +700,9 @@ class lib {
             $submission->files = self::get_submission_files($assign, $filesubmission, $usersubmission, $userid);
             $submission->profiledata = self::get_profile_data($profilefields, $submission);
             $submission->isprofiledata = count($profilefields) != 0;
+            $submission->submissiondata = self::get_submission_data(
+                $assign, $submission, $instance, $usersubmission, $userflags, $dateformat
+            );
 
             // User fields.
             $profilefields = explode(',', get_config('report_assign', 'profilefields'));
@@ -682,6 +805,9 @@ class lib {
             $profilefields = explode(',', $fields);
         }
 
+        // Submission fields.
+        $submissionfields = self::get_config_submissionfields_strings();
+
         // Field options pref.
         $fieldoptions = self::get_field_options();
         $splitusername = !empty($fieldoptions['splitusername']);
@@ -717,8 +843,9 @@ class lib {
         if ($groupmode) {
             $myxls->write_string(3, $i++, get_string('groups'));
         }
-        $myxls->write_string(3, $i++, get_string('status'));
-        $myxls->write_string(3, $i++, get_string('grade'));
+        foreach ($submissionfields as $fieldid => $fieldstring) {
+            $myxls->write_string(3, $i++, $fieldstring);
+        }
         if ($urkundenabled = self::urkund_enabled($assignment->id)) {
             $myxls->write_string(3, $i++, get_string('urkund', 'report_assign'));
         }
@@ -729,9 +856,6 @@ class lib {
             $myxls->write_string(3, $i++, get_string('workflow', 'report_assign'));
             $myxls->write_string(3, $i++, get_string('allocatedmarker', 'report_assign'));
         }
-        $myxls->write_string(3, $i++, get_string('grader', 'report_assign'));
-        $myxls->write_string(3, $i++, get_string('modified'));
-        $myxls->write_string(3, $i++, get_string('extension', 'report_assign'));
         $myxls->write_string(3, $i++, get_string('files'));
 
         // Add some data.
@@ -755,8 +879,12 @@ class lib {
             if ($groupmode) {
                 $myxls->write_string($row, $i++, $s->groups);
             }
-            $myxls->write_string($row, $i++, $s->status);
-            $myxls->write_string($row, $i++, html_entity_decode($s->grade));
+            foreach ($s->submissiondata as $value) {
+                $myxls->write_string($row, $i++, $value);
+            }
+            if (!empty($s->extensionduedate)) {
+                $myxls->write_string($row, $i++, $s->extensionduedate);
+            }
             if ($urkundenabled) {
                 $urkundscore = empty($s->urkund->similarityscore) ? '-' : $s->urkund->similarityscore;
                 $myxls->write_string($row, $i++, $urkundscore);
@@ -769,9 +897,6 @@ class lib {
                 $myxls->write_string($row, $i++, $s->workflow);
                 $myxls->write_string($row, $i++, $s->marker);
             }
-            $myxls->write_string($row, $i++, $s->grader);
-            $myxls->write_string($row, $i++, $s->modified);
-            $myxls->write_string($row, $i++, $s->extensionduedate);
             $myxls->write_string($row, $i++, $s->files);
             $row++;
         }
@@ -790,6 +915,9 @@ class lib {
         // Profile fields.
         $fields = get_config('report_assign', 'profilefields');
         $profilefields = explode(',', $fields);
+
+        // Submission fields.
+        $submissionfields = self::get_config_submissionfields_strings();
 
         // Field options pref.
         $fieldoptions = self::get_field_options();
@@ -824,8 +952,9 @@ class lib {
             }
         }
         $myxls->write_string(1, $i++, get_string('groups'));
-        $myxls->write_string(1, $i++, get_string('status'));
-        $myxls->write_string(1, $i++, get_string('grade'));
+        foreach ($submissionfields as $fieldid => $fieldstring) {
+            $myxls->write_string(1, $i++, $fieldstring);
+        }
         if ($isurkund) {
             $myxls->write_string(1, $i++, get_string('urkund', 'report_assign'));
         }
@@ -833,9 +962,6 @@ class lib {
             $myxls->write_string(1, $i++, get_string('turnitin', 'report_assign'));
         }
         $myxls->write_string(1, $i++, get_string('allocatedmarker', 'report_assign'));
-        $myxls->write_string(1, $i++, get_string('modified'));
-        $myxls->write_string(1, $i++, get_string('duedate', 'report_assign'));
-        $myxls->write_string(1, $i++, get_string('extension', 'report_assign'));
         $myxls->write_string(1, $i++, get_string('files'));
 
         // Add some data.
@@ -858,8 +984,12 @@ class lib {
                 }
             }
             $myxls->write_string($row, $i++, isset($s->groups) ? $s->groups : '-');
-            $myxls->write_string($row, $i++, $s->status);
-            $myxls->write_string($row, $i++, html_entity_decode($s->grade));
+            foreach ($s->submissiondata as $value) {
+                $myxls->write_string($row, $i++, $value);
+            }
+            if (!empty($s->extensionduedate)) {
+                $myxls->write_string($row, $i++, $s->extensionduedate);
+            }
             if ($isurkund) {
                 $myxls->write_string($row, $i++, isset($s->urkund->similarityscore) ? $s->urkund->similarityscore : '-');
             }
@@ -867,9 +997,6 @@ class lib {
                 $myxls->write_string($row, $i++, isset($s->turnitin->similarityscore) ? $s->turnitin->similarityscore : '-');
             }
             $myxls->write_string($row, $i++, isset($s->grader) ? $s->grader : '-');
-            $myxls->write_string($row, $i++, $s->modified);
-            $myxls->write_string($row, $i++, $s->duedate);
-            $myxls->write_string($row, $i++, $s->extensionduedate);
             $myxls->write_string($row, $i++, $s->files);
             $row++;
         }
