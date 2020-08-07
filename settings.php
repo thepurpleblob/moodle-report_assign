@@ -29,6 +29,7 @@ if ($hassiteconfig) {
     $settings = new admin_settingpage('report_assign_settings', new lang_string('pluginname', 'report_assign'));
 
     $rawchoices = [
+        'username',
         'email',
         'idnumber',
         'phone1',
