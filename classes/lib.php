@@ -688,6 +688,9 @@ class lib {
         $profileconfig = trim(get_config('report_assign', 'profilefields'));
         $profilefields = empty($profileconfig) ? [] : explode(',', $profileconfig);
 
+        $context = $assign->get_context();
+        $canrevealnames = $instance->revealidentities || has_capability('report/assign:shownames', $context);
+
         foreach ($submissions as $submission) {
             $userid = $submission->id;
             $coursegrade = grade_get_grades($courseid, 'mod', 'assign', $cm->instance, $userid);
@@ -715,6 +718,15 @@ class lib {
                     $submission->extensionduedate = userdate($userflags->extensionduedate, $dateformat);
                 } else {
                     $submission->extensionduedate = '-';
+                }
+            }
+            if ($instance->blindmarking) {
+                if (!$canrevealnames) {
+                    $s = '[' . get_string('blindmarkingon', 'report_assign') . ']';
+                    $submission->firstname = $s;
+                    $submission->lastname = $s;
+                    $submission->username = $s;
+                    $submission->email = $s;
                 }
             }
             $submission->participantno = empty($submission->recordid) ? '-' : $submission->recordid;
