@@ -87,10 +87,13 @@ class reportassign implements renderable, templatable {
 
         // Get submission field headers.
         $submissionfields = \report_assign\lib::get_config_submissionfields_strings();
+        // Get submission plugin headers.
+        $submissionplugins = \report_assign\lib::get_config_submissionplugins_assign_strings($this->assign);
         // Convert submission data from associative keys to indexed for template.
         $submissions = array_values($this->submissions);
         foreach ($submissions as $submission) {
             $submission->submissiondata = array_values($submission->submissiondata);
+            $submission->submissionplugindata = array_values($submission->submissionplugindata);
         }
 
         return [
@@ -107,6 +110,8 @@ class reportassign implements renderable, templatable {
             'groups' => array_values($groups),
             'submissionfieldsenabled' => count($submissionfields),
             'submissionfields' => array_values($submissionfields),
+            'submissionpluginsenabled' => count($submissionplugins),
+            'submissionplugins' => array_values($submissionplugins),
             'profilefields' => $this->get_profilefields(),
             'blindmarking' => $this->assignment->blindmarking,
             'extensionsok' => $this->extensionsok,

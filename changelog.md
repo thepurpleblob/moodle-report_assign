@@ -33,3 +33,4 @@ Converted submission fields to a preference, adding options for:
  - submission creation date
  - submission lateness (including extensions)
 NB: This has changed the field order in the columns.
+Converted File submission fields to a preference with all enabled submission plugins.

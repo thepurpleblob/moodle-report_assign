@@ -74,6 +74,29 @@ if ($hassiteconfig) {
             $submissionfields
     ));
 
+    $pluginmanager = \core_plugin_manager::instance();
+    // Selector for submission plugins.
+    $submissionplugins = $pluginmanager->get_plugins_of_type('assignsubmission');
+    $submissionpluginfields = [];
+    foreach ($submissionplugins as $plugin) {
+        if ($plugin->name == 'comments') {
+            // Submission comments don't work like other plugins.
+            // It's not currently needed, so skip it.
+            continue;
+        }
+        if ($plugin->is_enabled()) {
+            $submissionpluginfields[$plugin->name] = $plugin->displayname;
+        }
+    }
+
+    $settings->add(new admin_setting_configmulticheckbox(
+            'report_assign/submissionplugins',
+            new lang_string('submissionplugins', 'report_assign'),
+            new lang_string('submissionplugins_desc', 'report_assign'),
+            ["file" => 1, "plagiarism_turnitin" => 1, "plagiarism_urkund" => 1],
+            $submissionpluginfields
+    ));
+
     // Selector for field options.
     $rawchoices = [
         'splitusername',
