@@ -97,6 +97,19 @@ if ($hassiteconfig) {
             $submissionpluginfields
     ));
 
+    // Selector for course options.
+    $coursefields = [
+        "idnumber" => new lang_string('idnumbercourse'),
+    ];
+
+    $settings->add(new admin_setting_configmulticheckbox(
+        'report_assign/coursefields',
+        new lang_string('coursefields', 'report_assign'),
+        new lang_string('coursefields_desc', 'report_assign'),
+        [],
+        $coursefields
+    ));
+
     // Selector for field options.
     $rawchoices = [
         'splitusername',
