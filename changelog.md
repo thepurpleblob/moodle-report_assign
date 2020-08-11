@@ -35,3 +35,4 @@ Converted submission fields to a preference, adding options for:
 NB: This has changed the field order in the columns.
 Converted File submission fields to a preference with all enabled submission plugins.
 Added a placeholder() function for debugging; identifying which field a placeholder is for.
+Added course fields preference, for including more course info. (Only includes idnumber so far).

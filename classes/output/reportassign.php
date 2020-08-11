@@ -89,11 +89,15 @@ class reportassign implements renderable, templatable {
         $submissionfields = \report_assign\lib::get_config_submissionfields_strings();
         // Get submission plugin headers.
         $submissionplugins = \report_assign\lib::get_config_submissionplugins_assign_strings($this->assign);
+        // Get course field headers.
+        $coursefields = \report_assign\lib::get_config_coursefields_strings('coursefields');
+
         // Convert submission data from associative keys to indexed for template.
         $submissions = array_values($this->submissions);
         foreach ($submissions as $submission) {
             $submission->submissiondata = array_values($submission->submissiondata);
             $submission->submissionplugindata = array_values($submission->submissionplugindata);
+            $submission->coursedata = array_values($submission->coursedata);
         }
 
         return [
@@ -116,6 +120,8 @@ class reportassign implements renderable, templatable {
             'blindmarking' => $this->assignment->blindmarking,
             'extensionsok' => $this->extensionsok,
             'fieldoptions' => $fieldoptions,
+            'coursefieldsenabled' => count($coursefields),
+            'coursefields' => array_values($coursefields),
         ];
     }
 

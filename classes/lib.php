@@ -203,6 +203,69 @@ class lib {
     }
 
     /**
+     * Get course field choices from coursefields config.
+     * @return array
+     */
+    public static function get_config_coursefields() {
+        $fields = [];
+        $configstr = get_config('report_assign', 'coursefields');
+
+        if ($configstr != '') {
+            $fields = explode(',', $configstr);
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Get field choices from coursefields config, with strings.
+     * TODO: Add support for custom course fields.
+     * @return array
+     */
+    public static function get_config_coursefields_strings() {
+        $fieldsandstrings = [];
+        $configfields = self::get_config_coursefields();
+
+        foreach ($configfields as $field) {
+            switch ($field) {
+                case 'idnumber':
+                    $fieldsandstrings[$field] = get_string('idnumbercourse');
+                    break;
+                default:
+                    $fieldsandstrings[$field] = get_string($field);
+            }
+        }
+
+        return $fieldsandstrings;
+    }
+
+    /**
+     * Get course config choices from coursefields config.
+     * @param int $courseid
+     * @return array
+     */
+    public static function get_course_data($courseid) {
+        global $DB;
+
+        $coursedata = [];
+        $configstr = get_config('report_assign', 'coursefields');
+
+        if (!empty($configstr)) {
+            $configfields = self::get_config_coursefields();
+            $record = $DB->get_record('course', ['id' => $courseid], $configstr);
+            foreach ($configfields as $field) {
+                if (empty($record->$field)) {
+                    $coursedata[$field] = self::placeholder('courseid');
+                } else {
+                    $coursedata[$field] = $record->$field;
+                }
+            }
+        }
+
+        return $coursedata;
+    }
+
+    /**
      * can the user view the data submitted
      * some checks
      * @param int $assignid assignment id
@@ -837,6 +900,7 @@ class lib {
         $canrevealnames = $instance->revealidentities || has_capability('report/assign:shownames', $context);
 
         foreach ($submissions as $submission) {
+            $submission->coursedata = self::get_course_data($courseid);
             $userid = $submission->id;
             $coursegrade = grade_get_grades($courseid, 'mod', 'assign', $cm->instance, $userid);
             $gradeinstance = reset($coursegrade->items[0]->grades);
@@ -985,6 +1049,9 @@ class lib {
         // Get instance.
         $assignment = $assign->get_instance();
 
+        // Course fields.
+        $coursefields = self::get_config_coursefields_strings('coursefields');
+
         // Profile fields.
         $profilefields = [];
         $fields = get_config('report_assign', 'profilefields');
@@ -1020,6 +1087,9 @@ class lib {
         // Headers.
         $i = 0;
         $myxls->write_string(3, $i++, '#');
+        foreach ($coursefields as $fieldid => $fieldstring) {
+            $myxls->write_string(3, $i++, $fieldstring);
+        }
         if ($splitusername) {
             $myxls->write_string(3, $i++, get_string('firstname'));
             $myxls->write_string(3, $i++, get_string('lastname'));
@@ -1056,6 +1126,9 @@ class lib {
         foreach ($submissions as $s) {
             $i = 0;
             $myxls->write_number($row, $i++, $linecount++);
+            foreach ($s->coursedata as $value) {
+                $myxls->write_string($row, $i++, $value);
+            }
             if ($splitusername) {
                 $myxls->write_string($row, $i++, $s->firstname);
                 $myxls->write_string($row, $i++, $s->lastname);
@@ -1106,6 +1179,9 @@ class lib {
         global $CFG;
         require_once($CFG->dirroot.'/lib/excellib.class.php');
 
+        // Course fields.
+        $coursefields = self::get_config_coursefields_strings('coursefields');
+
         // Profile fields.
         $fields = get_config('report_assign', 'profilefields');
         $profilefields = explode(',', $fields);
@@ -1136,6 +1212,9 @@ class lib {
         // Headers.
         $i = 0;
         $myxls->write_string(1, $i++, '#');
+        foreach ($coursefields as $fieldid => $fieldstring) {
+            $myxls->write_string(1, $i++, $fieldstring);
+        }
         $myxls->write_string(1, $i++, get_string('assignmentname', 'report_assign'));
         if ($splitusername) {
             $myxls->write_string(1, $i++, get_string('firstname'));
@@ -1170,6 +1249,9 @@ class lib {
         foreach ($submissions as $s) {
             $i = 0;
             $myxls->write_number($row, $i++, $linecount++);
+            foreach ($s->coursedata as $value) {
+                $myxls->write_string($row, $i++, $value);
+            }
             $myxls->write_string($row, $i++, $s->assignmentname);
             if ($splitusername) {
                 $myxls->write_string($row, $i++, $s->firstname);
