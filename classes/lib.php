@@ -37,6 +37,21 @@ use stdClass;
 class lib {
 
     /**
+     * Give placeholder text, or the field id if debugging.
+     * @param string $fieldid
+     * @return string
+     */
+    private static function placeholder($fieldid) {
+
+        // Only set to true for debugging.
+        if (false) {
+            return "[placeholder: $fieldid]";
+        } else {
+            return '-';
+        }
+    }
+
+    /**
      * get blind assignments for this course
      * @param int $id course id
      * @return array
@@ -338,7 +353,7 @@ class lib {
                             $gradevalue = $grade->grade;
                         }
                         if ($gradevalue == -1 || $gradevalue === null) {
-                            $gradevalue = '-';
+                            $gradevalue = self::placeholder($fieldid);
                         } else {
                             $gradevalue = grade_format_gradevalue($grade->grade, $gradeitem);
                         }
@@ -363,7 +378,7 @@ class lib {
                             $latemessage = get_string('submittedlateshort', 'assign',  $usertime);
                             $submissiondata['latenessincext'] = $latemessage;
                         } else {
-                            $submissiondata['latenessincext'] = '-';
+                            $submissiondata['latenessincext'] = self::placeholder($fieldid);
                         }
                         break;
                     case 'extension':
@@ -381,7 +396,7 @@ class lib {
             foreach ($submissionfields as $fieldid => $fieldstring) {
                 if ($fieldid != 'extension') {
                     // Skip extension, which is handled directly in add_assignment_data().
-                    $submissiondata[$fieldid] = '-';
+                    $submissiondata[$fieldid] = self::placeholder($fieldid);
                 }
             }
         }
@@ -409,7 +424,7 @@ class lib {
             // ensuring all submissions have at least a placeholder for each plugin type.
             $configplugins = self::get_config_submissionplugins();
             foreach ($configplugins as $fieldid) {
-                $submissionpluginsdata[$fieldid] = '-';
+                $submissionpluginsdata[$fieldid] = self::placeholder($fieldid);
             }
         }
 
@@ -421,7 +436,7 @@ class lib {
 
             foreach ($submissionplugins as $fieldid => $plugin) {
                 if ($plugin->is_empty($usersubmission)) {
-                    $submissionpluginsdata[$fieldid] = '-';
+                    $submissionpluginsdata[$fieldid] = self::placeholder($fieldid);
                 } else {
                     switch ($fieldid) {
                         case 'file':
@@ -437,7 +452,7 @@ class lib {
         } else {
             // No submission.
             foreach ($submissionplugins as $fieldid => $plugin) {
-                $submissionpluginsdata[$fieldid] = '-';
+                $submissionpluginsdata[$fieldid] = self::placeholder($fieldid);
             }
         }
 
