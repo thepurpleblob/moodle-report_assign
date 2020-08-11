@@ -115,6 +115,79 @@ class lib {
     }
 
     /**
+     * Get plugin choices from submissionplugins config.
+     * @return array
+     */
+    public static function get_config_submissionplugins() {
+        $fields = [];
+        $configstr = get_config('report_assign', 'submissionplugins');
+
+        if ($configstr != '') {
+            $fields = explode(',', $configstr);
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Get config-enabled submission plugins enabled on an assignment.
+     * @param object $assign
+     * @return mixed
+     */
+    public static function get_config_submissionplugins_assign($assign) {
+        $submissionplugins = [];
+        $configplugins = self::get_config_submissionplugins();
+
+        $assignplugins = $assign->get_submission_plugins();
+
+        foreach ($assignplugins as $plugin) {
+            if ($plugin->is_enabled() && in_array($plugin->get_type(), $configplugins)) {
+                $submissionplugins[$plugin->get_type()] = $plugin;
+            }
+        }
+
+        return $submissionplugins;
+    }
+
+    /**
+     * Get config-enabled submission plugins enabled on an assignment, with display strings.
+     * @param object $assign
+     * @return array
+     */
+    public static function get_config_submissionplugins_assign_strings($assign) {
+        $fieldsandstrings = [];
+
+        $submissionplugins = self::get_config_submissionplugins_assign($assign);
+
+        foreach ($submissionplugins as $plugin) {
+            $fieldsandstrings[$plugin->get_type()] = $plugin->get_name();
+        }
+
+        return $fieldsandstrings;
+    }
+
+    /**
+     * Get config-enabled submission plugins enabled enabled on the site, with display strings.
+     * @return array
+     */
+    public static function get_config_submissionplugins_site_strings() {
+        $fieldsandstrings = [];
+
+        // No assign object, so get all submission plugins.
+        $pluginmanager = \core_plugin_manager::instance();
+        $submissionplugins = $pluginmanager->get_plugins_of_type('assignsubmission');
+
+        $configplugins = self::get_config_submissionplugins();
+        foreach ($submissionplugins as $plugin) {
+            if ($plugin->is_enabled() && in_array($plugin->name, $configplugins)) {
+                $fieldsandstrings[$plugin->name] = $plugin->displayname;
+            }
+        }
+
+        return $fieldsandstrings;
+    }
+
+    /**
      * can the user view the data submitted
      * some checks
      * @param int $assignid assignment id
@@ -250,9 +323,8 @@ class lib {
         $submissiondata = [];
         $submissionfields = self::get_config_submissionfields_strings();
 
-        if ($usersubmission) {
+        if ($usersubmission && $assign->has_submissions_or_grades()) {
             $userid = $submission->id;
-
             $gradeitem = $assign->get_grade_item();
             $grade = $assign->get_user_grade($userid, false);
             $gradevalue = empty($grade) ? null : $grade->grade;
@@ -327,6 +399,61 @@ class lib {
         }
 
         return $submissiondata;
+    }
+
+    /**
+     * Get data for submission plugins.
+     * @param object $assign
+     * @param object $submission
+     * @param object $usersubmission
+     * @param object $filesubmission
+     * @param boolean $exportall
+     * @return mixed
+     */
+    public static function get_submissionplugin_data(
+        $assign, $submission, $usersubmission, $filesubmission, $exportall
+    ) {
+        $submissionpluginsdata = [];
+        $submissionplugins = self::get_config_submissionplugins_assign($assign);
+
+        if ($exportall) {
+            // When exporting all, ensure data columns align with header columns, by
+            // ensuring all submissions have at least a placeholder for each plugin type.
+            $configplugins = self::get_config_submissionplugins();
+            foreach ($configplugins as $fieldid) {
+                $submissionpluginsdata[$fieldid] = '-';
+            }
+        }
+
+        if ($usersubmission && $assign->has_submissions_or_grades()) {
+            $userid = $submission->id;
+            $gradeitem = $assign->get_grade_item();
+            $grade = $assign->get_user_grade($userid, false);
+            $gradevalue = empty($grade) ? null : $grade->grade;
+
+            foreach ($submissionplugins as $fieldid => $plugin) {
+                if ($plugin->is_empty($usersubmission)) {
+                    $submissionpluginsdata[$fieldid] = '-';
+                } else {
+                    switch ($fieldid) {
+                        case 'file':
+                            $submissionpluginsdata['file'] = self::get_submission_files(
+                                $assign, $filesubmission, $usersubmission, $userid
+                            );
+                            break;
+                        default:
+                            $submissionpluginsdata[$fieldid] = trim(html_to_text($plugin->view($usersubmission)));
+                    }
+                }
+            }
+        } else {
+            // No submission.
+            foreach ($submissionplugins as $fieldid => $plugin) {
+                $submissionpluginsdata[$fieldid] = '-';
+            }
+        }
+
+        return $submissionpluginsdata;
     }
 
     /**
@@ -661,12 +788,13 @@ class lib {
     /**
      * Add assignment data
      * @param int $assid
-     * @param object $dm
+     * @param object $cm
      * @param assign $assign
      * @param array $submissions
+     * @param boolean $exportall
      * @return array
      */
-    public static function add_assignment_data($courseid, $assid, $cm, $assign, $submissions) {
+    public static function add_assignment_data($courseid, $assid, $cm, $assign, $submissions, $exportall = false) {
         $cmid = $cm->id;
 
         // Report date format.
@@ -675,7 +803,9 @@ class lib {
         // Submission fields selected in preferences.
         $submissionfields = self::get_config_submissionfields();
 
-        // Get sub plugins.
+        // Submission plugin fields.
+        $submissionplugins = self::get_config_submissionplugins($assign);
+
         $filesubmission = self::get_submission_plugin_files($assign);
 
         // Get instance.
@@ -733,13 +863,15 @@ class lib {
             list($submission->groups, $submission->groupids) = self::get_user_groups($userid, $courseid);
             $submission->urkund = self::get_urkund_score($assid, $cmid, $userid);
             $submission->turnitin = self::get_turnitin_score($assid, $cmid, $userid);
-            $submission->files = self::get_submission_files($assign, $filesubmission, $usersubmission, $userid);
             $submission->profiledata = self::get_profile_data($profilefields, $submission);
             $submission->isprofiledata = count($profilefields) != 0;
             $submission->submissiondata = self::get_submission_data(
                 $assign, $submission, $instance, $usersubmission, $userflags, $dateformat
             );
             $submission->submissiondata['released'] = $released;
+            $submission->submissionplugindata = self::get_submissionplugin_data(
+                $assign, $submission, $usersubmission, $filesubmission, $exportall
+            );
 
             // User fields.
             $profilefields = explode(',', get_config('report_assign', 'profilefields'));
@@ -831,9 +963,12 @@ class lib {
      * @param string $filename
      * @param array $submissions
      */
-    public static function export($assignment, $filename, $submissions) {
+    public static function export($assign, $filename, $submissions) {
         global $CFG;
         require_once($CFG->dirroot.'/lib/excellib.class.php');
+
+        // Get instance.
+        $assignment = $assign->get_instance();
 
         // Profile fields.
         $profilefields = [];
@@ -844,6 +979,9 @@ class lib {
 
         // Submission fields.
         $submissionfields = self::get_config_submissionfields_strings();
+
+        // Submission plugin fields.
+        $submissionplugins = self::get_config_submissionplugins_assign_strings($assign);
 
         // Field options pref.
         $fieldoptions = self::get_field_options();
@@ -883,6 +1021,9 @@ class lib {
         foreach ($submissionfields as $fieldid => $fieldstring) {
             $myxls->write_string(3, $i++, $fieldstring);
         }
+        foreach ($submissionplugins as $fieldid => $fieldstring) {
+            $myxls->write_string(3, $i++, $fieldstring);
+        }
         if ($urkundenabled = self::urkund_enabled($assignment->id)) {
             $myxls->write_string(3, $i++, get_string('urkund', 'report_assign'));
         }
@@ -893,7 +1034,6 @@ class lib {
             $myxls->write_string(3, $i++, get_string('workflow', 'report_assign'));
             $myxls->write_string(3, $i++, get_string('allocatedmarker', 'report_assign'));
         }
-        $myxls->write_string(3, $i++, get_string('files'));
 
         // Add some data.
         $row = 4;
@@ -922,6 +1062,9 @@ class lib {
             if (!empty($s->extensionduedate)) {
                 $myxls->write_string($row, $i++, $s->extensionduedate);
             }
+            foreach ($s->submissionplugindata as $value) {
+                $myxls->write_string($row, $i++, $value);
+            }
             if ($urkundenabled) {
                 $urkundscore = empty($s->urkund->similarityscore) ? '-' : $s->urkund->similarityscore;
                 $myxls->write_string($row, $i++, $urkundscore);
@@ -934,7 +1077,6 @@ class lib {
                 $myxls->write_string($row, $i++, $s->workflow);
                 $myxls->write_string($row, $i++, $s->marker);
             }
-            $myxls->write_string($row, $i++, $s->files);
             $row++;
         }
         $workbook->close();
@@ -956,13 +1098,17 @@ class lib {
         // Submission fields.
         $submissionfields = self::get_config_submissionfields_strings();
 
+        // Submission plugin fields.
+        $submissionplugins = self::get_config_submissionplugins_site_strings();
+
         // Field options pref.
         $fieldoptions = self::get_field_options();
         $splitusername = !empty($fieldoptions['splitusername']);
 
         // Plagiarism plugins?
-        $isturnitin = !empty(\core_plugin_manager::instance()->get_plugin_info('plagiarism_turnitin'));
-        $isurkund = !empty(\core_plugin_manager::instance()->get_plugin_info('plagiarism_urkund'));
+        $p = $CFG->enableplagiarism;
+        $isturnitin = $p && !empty(\core_plugin_manager::instance()->get_plugin_info('plagiarism_turnitin'));
+        $isurkund = $p && !empty(\core_plugin_manager::instance()->get_plugin_info('plagiarism_urkund'));
 
         $workbook = new \MoodleExcelWorkbook("-");
 
@@ -992,6 +1138,9 @@ class lib {
         foreach ($submissionfields as $fieldid => $fieldstring) {
             $myxls->write_string(1, $i++, $fieldstring);
         }
+        foreach ($submissionplugins as $fieldid => $fieldstring) {
+            $myxls->write_string(1, $i++, $fieldstring);
+        }
         if ($isurkund) {
             $myxls->write_string(1, $i++, get_string('urkund', 'report_assign'));
         }
@@ -999,7 +1148,6 @@ class lib {
             $myxls->write_string(1, $i++, get_string('turnitin', 'report_assign'));
         }
         $myxls->write_string(1, $i++, get_string('allocatedmarker', 'report_assign'));
-        $myxls->write_string(1, $i++, get_string('files'));
 
         // Add some data.
         $row = 2;
@@ -1027,6 +1175,9 @@ class lib {
             if (!empty($s->extensionduedate)) {
                 $myxls->write_string($row, $i++, $s->extensionduedate);
             }
+            foreach ($s->submissionplugindata as $value) {
+                $myxls->write_string($row, $i++, $value);
+            }
             if ($isurkund) {
                 $myxls->write_string($row, $i++, isset($s->urkund->similarityscore) ? $s->urkund->similarityscore : '-');
             }
@@ -1034,7 +1185,6 @@ class lib {
                 $myxls->write_string($row, $i++, isset($s->turnitin->similarityscore) ? $s->turnitin->similarityscore : '-');
             }
             $myxls->write_string($row, $i++, isset($s->grader) ? $s->grader : '-');
-            $myxls->write_string($row, $i++, $s->files);
             $row++;
         }
         $workbook->close();

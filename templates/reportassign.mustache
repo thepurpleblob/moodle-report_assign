@@ -36,6 +36,9 @@
         {{# submissionfields }}
             <th>{{{ . }}}</th>
         {{/ submissionfields }}
+        {{# submissionplugins }}
+            <th>{{{ . }}}</th>
+        {{/ submissionplugins }}
         {{# groupselect }}
             <th>{{# str }}groups{{/ str }}</th>
         {{/ groupselect }}
@@ -49,7 +52,6 @@
             <th>{{# str }}workflow, report_assign{{/ str }}</th>
             <th>{{# str }}allocatedmarker, report_assign{{/ str }}</th>
         {{/ assignment.markingallocation }}
-        <th class="w-25">{{# str }}files{{/ str }}</th>
         <th>&nbsp;</th>
     </thead>
     <tbody>
@@ -87,6 +89,11 @@
                         </td>
                     {{/ extensionduedate }}
                 {{/ submissionfieldsenabled }}
+                {{# submissionpluginsenabled }}
+                    {{# submissionplugindata }}
+                        <td>{{ . }}</td>
+                    {{/ submissionplugindata }}
+                {{/ submissionpluginsenabled }}
                 {{# urkundenabled }}
                     <td>
                         {{# urkund }}
@@ -105,7 +112,6 @@
                     <td>{{ workflow }}</td>
                     <td>{{ marker }}</td>
                 {{/ assignment.markingallocation }}
-                <td class="w-25">{{ files }}</td>
                 <td><a class="btn btn-info btn-sm" href="{{{ loglink }}}">{{# str }}log, report_assign{{/ str }}</a></td>
             </tr>
         {{/ submissions }}
