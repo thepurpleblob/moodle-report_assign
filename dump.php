@@ -66,6 +66,7 @@ if ($form->is_cancelled()) {
         'feedbackcomments' => $data->feedbackcomments,
         'annotatedpdfs' => $data->annotatedpdfs,
         'submissions' => $data->submissions,
+        'exportonlyactive' => $data->exportonlyactive
     ];
     $url = new moodle_url('/report/assign/index.php', $params);
     redirect($url);

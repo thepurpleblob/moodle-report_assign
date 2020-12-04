@@ -78,3 +78,4 @@ $string['urkundenabled'] = 'Urkund enabled';
 $string['workbook'] = 'Assignment submission report export';
 $string['workflow'] = 'Workflow';
 $string['workflowon'] = 'Workflow enabled';
+$string['exportonlyactive'] = 'Exclude suspended users';

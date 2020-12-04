@@ -114,6 +114,7 @@ if ($assignid) {
             'feedbackfiles' => optional_param('feedbackfiles', 0, PARAM_INT),
             'feedbackcomments' => optional_param('feedbackcomments', 0, PARAM_INT),
             'annotatedpdfs' => optional_param('annotatedpdfs', 0, PARAM_INT),
+            'exportonlyactive' => optional_param('exportonlyactive',0,PARAM_INT),
         ];
         $files = report_assign\lib::get_all_files($assign, $cm->id, $submissions, $params);
 
