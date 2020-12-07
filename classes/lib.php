@@ -374,7 +374,7 @@ class lib {
             $userauth = $submission->auth;
             $usersuspended = $submission->suspended;
             
-            // When get exportonlyactive = 1 and if user has nologin auth or user is suspended then just foreget it.
+            // When get exportonlyactive = 1 and if user has nologin auth or user is suspended then just forget it.
             if ($params['exportonlyactive'] && ($userauth == "nologin" || $usersuspended == 1)) {
                 continue;
             }
