@@ -54,6 +54,11 @@ class lib {
         // Add plagiarism and feedback status.
         $assignments = [];
         foreach ($assigns as $cm) {
+            // Skip activities deleted in the course.
+            $rec = $cm->get_course_module_record();
+            if ($rec->deletioninprogress) {
+                continue;
+            }
             $context = \context_module::instance($cm->id);
             $assignment = new \assign($context, $cm, $course);
             $instance = $assignment->get_instance();
