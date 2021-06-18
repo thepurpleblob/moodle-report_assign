@@ -30,6 +30,7 @@ defined('MOODLE_INTERNAL') || die;
 define('FILENAME_SHORTEN', 30);
 
 //require_once($CFG->dirroot.'/mod/assign/locallib.php');
+require_once($CFG->dirroot . '/grade/querylib.php');
 
 use \assignfeedback_editpdf\document_services;
 use stdClass;
@@ -500,12 +501,13 @@ class lib {
     /**
      * Add assignment data
      * @param int $assid
-     * @param int $cmid
+     * @param object $dm
      * @param assign $assign
      * @param array $submissions
      * @return array
      */
-    public static function add_assignment_data($courseid, $assid, $cmid, $assign, $submissions) {
+    public static function add_assignment_data($courseid, $assid, $cm, $assign, $submissions) {
+        $cmid = $cm->id;
 
         // Report date format.
         $dateformat = get_string('strftimedatetimeshort', 'langconfig');
@@ -525,6 +527,10 @@ class lib {
 
         foreach ($submissions as $submission) {
             $userid = $submission->id;
+            $coursegrade = grade_get_grades($courseid, 'mod', 'assign', $cm->instance, $userid);
+            $gradeinstance = reset($coursegrade->items[0]->grades);
+            $dategraded = $gradeinstance->dategraded;
+            $submission->released = empty($dategraded) ? '-' : userdate($dategraded, $dateformat);
             $submission->assignmentid = $assid;
             $submission->userid = $userid;
             $userflags = $assign->get_user_flags($userid, false);
@@ -689,7 +695,7 @@ class lib {
             $myxls->write_string(3, $i++, get_string('groups'));
         }
         $myxls->write_string(3, $i++, get_string('status'));
-        $myxls->write_string(3, $i++, get_string('grade'));
+        $myxls->write_string(3, $i++, get_string('grade', 'report_assign'));
         if ($urkundenabled = self::urkund_enabled($assignment->id)) {
             $myxls->write_string(3, $i++, get_string('urkund', 'report_assign'));
         }
@@ -702,6 +708,7 @@ class lib {
         }
         $myxls->write_string(3, $i++, get_string('grader', 'report_assign'));
         $myxls->write_string(3, $i++, get_string('modified'));
+        $myxls->write_string(3, $i++, get_string('released', 'report_assign'));
         $myxls->write_string(3, $i++, get_string('extension', 'report_assign'));
         $myxls->write_string(3, $i++, get_string('files'));
 
@@ -737,6 +744,7 @@ class lib {
             }
             $myxls->write_string($row, $i++, $s->grader);
             $myxls->write_string($row, $i++, $s->modified);
+            $myxls->write_string($row, $i++, $s->released);
             $myxls->write_string($row, $i++, $s->extensionduedate);
             $myxls->write_string($row, $i++, $s->files);
             $row++;

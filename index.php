@@ -81,7 +81,7 @@ if ($exportall) {
         //$assignment = $DB->get_record('assign', ['id' => $assignid], '*', MUST_EXIST);
         $submissions = $assign->list_participants_with_filter_status_and_group(0);
         $cm = get_coursemodule_from_instance('assign', $assignid);
-        $submissions = report_assign\lib::add_assignment_data($course->id, $assignid, $cm->id, $assign, $submissions);
+        $submissions = report_assign\lib::add_assignment_data($course->id, $assignid, $cm, $assign, $submissions);
         foreach ($submissions as $submission) {
             $submission->assignmentname = $assignment->name;
             $submission->duedate = empty($assignment->duedate) ? '-' : userdate($assignment->duedate, get_string('strftimedatetimeshort', 'langconfig'));
@@ -105,7 +105,7 @@ if ($assignid) {
     // Participants.
     $submissions = $assign->list_participants_with_filter_status_and_group($group);
     $cm = get_coursemodule_from_instance('assign', $assignid);
-    $submissions = report_assign\lib::add_assignment_data($course->id, $assignid, $cm->id, $assign, $submissions);
+    $submissions = report_assign\lib::add_assignment_data($course->id, $assignid, $cm, $assign, $submissions);
 
     // Data dump.
     if ($dump) {

@@ -64,6 +64,7 @@ $string['pluginname'] = 'Assignment submission report';
 $string['privacy:metadata'] = 'The Assignment submission report only shows data stored in other locations.';
 $string['profilefields'] = 'Profile fields';
 $string['profilefields_desc'] = 'Include these additional profile fields in the report';
+$string['released'] = 'Released';
 $string['revealidentities'] = 'Identities revealed';
 $string['selectassignment'] = 'Select assignment to view submission report';
 $string['status'] = 'Status';

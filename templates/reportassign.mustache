@@ -44,6 +44,7 @@
         {{/ assignment.markingallocation }}
         <th>{{# str }}grader, report_assign{{/ str }}</th>
         <th>{{# str }}modified{{/ str }}</th>
+        <th>{{# str }}released, report_assign{{/ str }}</th>
         <th>{{# str }}extension, report_assign{{/ str }}</th>
         <th class="w-25">{{# str }}files{{/ str }}</th>
     </thead>
@@ -84,6 +85,7 @@
                 {{/ assignment.markingallocation }}
                 <td>{{ grader }}</td>
                 <td>{{ modified }}</td>
+                <td>{{ released }}</td>
                 <td><span id="extensionuser_{{ userid }}">{{ extensionduedate }}</span>
                     {{# extensionsok }}
                         <a href="#" class="doextension" data-assignmentid="{{ assignmentid }}" data-userid="{{ userid }}" data-fullname="{{ fullname }}" title="{{# str }}addextension, report_assign{{/ str }}">
