@@ -73,7 +73,6 @@ class report_assign_external extends external_api {
             $userflag['workflowstate'] = '';
             $userflag['allocatedmarker'] = 0; 
         }
-        error_log('UF: HERE' . print_r($userflag, true) );
 
         return $userflag;
     }
