@@ -47,6 +47,7 @@
         <th>{{# str }}released, report_assign{{/ str }}</th>
         <th>{{# str }}extension, report_assign{{/ str }}</th>
         <th class="w-25">{{# str }}files{{/ str }}</th>
+        <th>&nbsp;</th>
     </thead>
     <tbody>
         {{# submissions }}
@@ -94,6 +95,7 @@
                     {{/ extensionsok}}
                 </td>
                 <td class="w-25">{{ files }}</td>
+                <td><a class="btn btn-info btn-sm" href="{{{ loglink }}}">{{# str }}log, report_assign{{/ str }}</a></td>
             </tr>
         {{/ submissions }}
     <tbody>

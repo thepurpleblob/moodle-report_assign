@@ -1,0 +1,28 @@
+
+<h1>{{ fullname }}</h1>
+
+{{^ anylogs }}
+    <div class="alert alert-warning my-3">
+        {{# str }}nologdata, report_assign{{/ str }}
+    </div>
+{{/ anylogs }}
+{{# anylogs }}
+    <table class="table">
+        <thead>
+            <th>{{# str }}time{{/ str }}</th>
+            <th>{{# str }}action{{/ str }}</th>
+            <th>{{# str }}byuser, report_assign{{/ str }}</th>
+        </thead>
+        <tbody>
+            {{# logs }}
+                <tr>
+                    <td>{{ logtime }}</td>
+                    <td>{{ description }}</td>
+                    <td>{{ byuser }}</td>
+                </tr>
+            {{/ logs }}
+        </tbody>
+    </table>
+{{/ anylogs }}
+
+<a class="btn btn-primary" href="{{{ back }}}">{{# str }}back{{/ str }}</a>

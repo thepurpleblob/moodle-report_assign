@@ -533,6 +533,13 @@ class lib {
             $submission->released = empty($dategraded) ? '-' : userdate($dategraded, $dateformat);
             $submission->assignmentid = $assid;
             $submission->userid = $userid;
+            $submission->loglink = new \moodle_url('/report/assign/userlog.php', [
+                'fullname' => $submission->fullname,
+                'userid' => $userid,
+                'assignid' => $assid,
+                'courseid' => $courseid,
+                'cmid' => $cmid
+            ]);
             $userflags = $assign->get_user_flags($userid, false);
             list($submission->workflow, $submission->marker) = self::get_workflow($userflags);
             if ($instance->teamsubmission) {
