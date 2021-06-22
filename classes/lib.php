@@ -555,7 +555,7 @@ class lib {
             if ($usersubmission) {
                 $submission->created = userdate($usersubmission->timecreated, $dateformat);
                 $submission->modified = userdate($usersubmission->timemodified, $dateformat);
-                $submission->status = $usersubmission->status;
+                $submission->status = get_string('status' . $usersubmission->status, 'report_assign');
                 $submissionid = $usersubmission->id;
                 $grade = $assign->get_user_grade($userid, false);
                 $gradevalue = empty($grade) ? null : $grade->grade;
