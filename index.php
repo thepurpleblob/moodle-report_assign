@@ -81,7 +81,7 @@ if ($exportall) {
         //$assignment = $DB->get_record('assign', ['id' => $assignid], '*', MUST_EXIST);
         $submissions = $assign->list_participants_with_filter_status_and_group(0);
         $cm = get_coursemodule_from_instance('assign', $assignid);
-        $submissions = report_assign\lib::add_assignment_data($course->id, $assignid, $cm, $assign, $submissions);
+        $submissions = report_assign\lib::add_assignment_data($course->id, $assignid, $cm, $assign, $submissions, $exportall);
         foreach ($submissions as $submission) {
             $submission->assignmentname = $assignment->name;
             $submission->duedate = empty($assignment->duedate) ? '-' : userdate($assignment->duedate, get_string('strftimedatetimeshort', 'langconfig'));
@@ -146,7 +146,7 @@ if ($assignid) {
 
     if ($export) {
         $filename = "assign_{$assignment->name}.xls";
-        report_assign\lib::export($assignment, $filename, $submissions);
+        report_assign\lib::export($assign, $filename, $submissions);
 
         // Trigger an assignment viewed event.
         $event = \report_assign\event\assignment_export::create([
@@ -161,7 +161,7 @@ if ($assignid) {
     // Display report.
     $showparticipantnumber = $assignment->blindmarking && !$assign->is_blind_marking();
     $extensionsok = report_assign\lib::is_extension_allowed($assign);
-    $reportassign = new report_assign\output\reportassign($course, $context, $fullurl, $submissions, $assignment, $showparticipantnumber, $extensionsok);
+    $reportassign = new report_assign\output\reportassign($course, $context, $fullurl, $submissions, $assign, $showparticipantnumber, $extensionsok);
     echo $output->render_reportassign($reportassign);
 
     // Trigger an assignment viewed event.
@@ -182,5 +182,3 @@ if ($assignid) {
 }
 
 echo $output->footer();
-
-

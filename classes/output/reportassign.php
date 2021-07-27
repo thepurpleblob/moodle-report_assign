@@ -42,18 +42,21 @@ class reportassign implements renderable, templatable {
 
     protected $submissions;
 
+    protected $assign;
+
     protected $assignment;
 
     protected $showparticipantnumber;
 
     protected $extensionsok;
 
-    public function __construct($course, $context, $fullurl, $submissions, $assignment, $showparticipantnumber, $extensionsok) {
+    public function __construct($course, $context, $fullurl, $submissions, $assign, $showparticipantnumber, $extensionsok) {
         $this->course = $course;
         $this->context = $context;
         $this->fullurl = $fullurl;
         $this->submissions = $submissions;
-        $this->assignment = $assignment;
+        $this->assign = $assign;
+        $this->assignment = $assign->get_instance();
         $this->showparticipantnumber = $showparticipantnumber;
         $this->extensionsok = $extensionsok;
     }
@@ -80,21 +83,45 @@ class reportassign implements renderable, templatable {
         $groupmode = $cm->groupmode;
         $groups = groups_get_all_groups($this->course->id);
 
+        $fieldoptions = \report_assign\lib::get_field_options();
+
+        // Get submission field headers.
+        $submissionfields = \report_assign\lib::get_config_submissionfields_strings();
+        // Get submission plugin headers.
+        $submissionplugins = \report_assign\lib::get_config_submissionplugins_assign_strings($this->assign);
+        // Get course field headers.
+        $coursefields = \report_assign\lib::get_config_coursefields_strings('coursefields');
+
+        // Convert submission data from associative keys to indexed for template.
+        $submissions = array_values($this->submissions);
+        foreach ($submissions as $submission) {
+            $submission->submissiondata = array_values($submission->submissiondata);
+            $submission->submissionplugindata = array_values($submission->submissionplugindata);
+            $submission->coursedata = array_values($submission->coursedata);
+        }
+
         return [
             'canrevealnames' => has_capability('report/assign:shownames', $this->context) && $this->assignment->blindmarking,
             'canexport' => has_capability('report/assign:export', $this->context),
             'baseurl' => $this->fullurl,
             'backurl' => new \moodle_url('/report/assign/index.php', ['id' => $this->course->id]),
-            'submissions' => array_values($this->submissions),
+            'submissions' => $submissions,
             'assignment' => $this->assignment,
             'enableplagiarism' => !empty($CFG->enableplagiarism),
             'turnitinenabled' => \report_assign\lib::turnitin_enabled($this->assignment->id),
             'urkundenabled' => \report_assign\lib::urkund_enabled($this->assignment->id),
             'groupselect' => $groupmode != 0,
             'groups' => array_values($groups),
+            'submissionfieldsenabled' => count($submissionfields),
+            'submissionfields' => array_values($submissionfields),
+            'submissionpluginsenabled' => count($submissionplugins),
+            'submissionplugins' => array_values($submissionplugins),
             'profilefields' => $this->get_profilefields(),
             'blindmarking' => $this->assignment->blindmarking,
             'extensionsok' => $this->extensionsok,
+            'fieldoptions' => $fieldoptions,
+            'coursefieldsenabled' => count($coursefields),
+            'coursefields' => array_values($coursefields),
         ];
     }
 

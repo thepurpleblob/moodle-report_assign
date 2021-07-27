@@ -23,3 +23,16 @@ Improved display of buttons etc.
 Participant number is now always displayed for anonymous Assignments
 Option to add extensions directly from report
 Bug fixes
+
+Unreleased
+Changed "Username" to "Name" (for firstname lastname), allowing "Username" separately for the user login name.
+Added option of splitting name into separate columns for first and last names.
+Added "Username" option to Profile field options (for login name).
+Converted submission fields to a preference, adding options for:
+ - grade value and maximum grade in separate columns.
+ - submission creation date
+ - submission lateness (including extensions)
+NB: This has changed the field order in the columns.
+Converted File submission fields to a preference with all enabled submission plugins.
+Added a placeholder() function for debugging; identifying which field a placeholder is for.
+Added course fields preference, for including more course info. (Only includes idnumber so far).
