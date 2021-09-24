@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;   
+defined('MOODLE_INTERNAL') || die;
 
 /**
  * Assign functions
@@ -56,14 +56,14 @@ class report_assign_external extends external_api {
                         ['assignmentid' => $assignmentid, 'userid' => $userid]);
 
         $userflag = [];
-        if ($flags = $DB->get_record('assign_user_flags', ['userid' => $userid, 'assignment' => $assignmentid])) {     
+        if ($flags = $DB->get_record('assign_user_flags', ['userid' => $userid, 'assignment' => $assignmentid])) {
             $userflag['id'] = $flags->id;
             $userflag['userid'] = $flags->userid;
             $userflag['locked'] = $flags->locked;
             $userflag['mailed'] = $flags->mailed;
             $userflag['extensionduedate'] = $flags->extensionduedate;
             $userflag['workflowstate'] = $flags->workflowstate;
-            $userflag['allocatedmarker'] = $flags->allocatedmarker;            
+            $userflag['allocatedmarker'] = $flags->allocatedmarker;
         } else {
             $userflag['id'] = 0;
             $userflag['userid'] = 0;
@@ -71,7 +71,7 @@ class report_assign_external extends external_api {
             $userflag['mailed'] = 0;
             $userflag['extensionduedate'] = 0;
             $userflag['workflowstate'] = '';
-            $userflag['allocatedmarker'] = 0; 
+            $userflag['allocatedmarker'] = 0;
         }
 
         return $userflag;
