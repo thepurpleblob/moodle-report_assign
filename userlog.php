@@ -32,7 +32,8 @@ $courseid = required_param('courseid', PARAM_INT);
 $cmid = required_param('cmid', PARAM_INT);
 $fullname = required_param('fullname', PARAM_NOTAGS);
 
-$url = new moodle_url('/report/assign/userlog.php', ['userid' => $userid, 'courseid' => $courseid, 'assignid' => $assignid, 'cmid' => $cmid]);
+$url = new moodle_url('/report/assign/userlog.php', ['userid' => $userid,
+    'courseid' => $courseid, 'assignid' => $assignid, 'cmid' => $cmid]);
 
 // Page setup.
 $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
@@ -50,8 +51,8 @@ require_capability('report/assign:view', $context);
 
 $assignment = $DB->get_record('assign', ['id' => $assignid], '*', MUST_EXIST);
 
-// log events that we want to show
-// event_name_in_log_table => string name in mod_assign
+// Log events that we want to show.
+// The event_name_in_log_table => string name in mod_assign.
 $eventfilter = [
     '\mod_assign\event\assessable_submitted' => 'eventassessablesubmitted',
     '\mod_assign\event\remove_submission_form_viewed' => 'eventremovesubmissionformviewed',
@@ -63,7 +64,7 @@ $eventfilter = [
 $dateformat = get_string('strftimedatetimeshort', 'langconfig');
 list($insql, $params) = $DB->get_in_or_equal(array_keys($eventfilter), SQL_PARAMS_NAMED);
 $sql = 'SELECT * FROM {logstore_standard_log}
-    WHERE (userid = :userid OR relateduserid = :relateduserid) 
+    WHERE (userid = :userid OR relateduserid = :relateduserid)
     AND contextinstanceid = :cmid
     AND eventname ' . $insql . '
     ORDER BY timecreated DESC';
@@ -83,7 +84,7 @@ foreach ($logs as $log) {
     $log->description = get_string($eventfilter[$log->eventname], 'mod_assign');
 }
 
-$backlink = new moodle_url('/report/assign/index.php',[
+$backlink = new moodle_url('/report/assign/index.php', [
     'id' => $courseid,
     'assign' => $assignid,
 ]);

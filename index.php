@@ -78,13 +78,13 @@ if ($exportall) {
             continue;
         }
         $assign = \report_assign\lib::get_assign($course, $assignid);
-        //$assignment = $DB->get_record('assign', ['id' => $assignid], '*', MUST_EXIST);
         $submissions = $assign->list_participants_with_filter_status_and_group(0);
         $cm = get_coursemodule_from_instance('assign', $assignid);
         $submissions = report_assign\lib::add_assignment_data($course->id, $assignid, $cm, $assign, $submissions);
         foreach ($submissions as $submission) {
             $submission->assignmentname = $assignment->name;
-            $submission->duedate = empty($assignment->duedate) ? '-' : userdate($assignment->duedate, get_string('strftimedatetimeshort', 'langconfig'));
+            $submission->duedate = empty($assignment->duedate) ? '-' : userdate($assignment->duedate,
+                get_string('strftimedatetimeshort', 'langconfig'));
         }
         $allsubmissions = array_merge($allsubmissions, $submissions);
     }
@@ -99,7 +99,7 @@ if ($assignid) {
     // Create assignment object.
     $assign = \report_assign\lib::get_assign($course, $assignid);
 
-    // Javascript
+    // Javascript.
     $PAGE->requires->js_call_amd('report_assign/filter', 'init', [$assign->get_instance()->duedate]);
 
     // Participants.
@@ -161,7 +161,8 @@ if ($assignid) {
     // Display report.
     $showparticipantnumber = $assignment->blindmarking && !$assign->is_blind_marking();
     $extensionsok = report_assign\lib::is_extension_allowed($assign);
-    $reportassign = new report_assign\output\reportassign($course, $context, $fullurl, $submissions, $assignment, $showparticipantnumber, $extensionsok);
+    $reportassign = new report_assign\output\reportassign($course, $context,
+        $fullurl, $submissions, $assignment, $showparticipantnumber, $extensionsok);
     echo $output->render_reportassign($reportassign);
 
     // Trigger an assignment viewed event.

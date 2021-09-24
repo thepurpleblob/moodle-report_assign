@@ -29,7 +29,6 @@ defined('MOODLE_INTERNAL') || die;
 
 define('FILENAME_SHORTEN', 30);
 
-//require_once($CFG->dirroot.'/mod/assign/locallib.php');
 require_once($CFG->dirroot . '/grade/querylib.php');
 
 use \assignfeedback_editpdf\document_services;
@@ -352,10 +351,10 @@ class lib {
      */
     protected static function sanitise_filename($path) {
         $bad = array_merge(
-            array_map('chr', range(0,31)),
+            array_map('chr', range(0, 31)),
             array("<", ">", ":", '"', "\\", "|", "?", "*"));
         return str_replace($bad, "_", $path);
-    } 
+    }
 
     /**
      * Get feedback
