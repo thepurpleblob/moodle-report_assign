@@ -45,8 +45,9 @@ $PAGE->set_heading($course->fullname);
 // Security.
 $output = $PAGE->get_renderer('report_assign');
 $context = context_course::instance($course->id);
-require_capability('mod/assign:grade', $context);
-require_capability('report/assign:view', $context);
+if(!require_capability('report/assign:viewlog', $context)) {
+    throw new Exception("Capability Error. Cannot view the logs.", 1);    
+}
 
 $assignment = $DB->get_record('assign', ['id' => $assignid], '*', MUST_EXIST);
 
