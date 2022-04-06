@@ -47,7 +47,9 @@
         <th>{{# str }}released, report_assign{{/ str }}</th>
         <th>{{# str }}extension, report_assign{{/ str }}</th>
         <th class="w-25">{{# str }}files{{/ str }}</th>
-        <th>&nbsp;</th>
+        {{# canviewlogs }}
+            <th>&nbsp;</th>
+        {{/ canviewlogs }}
     </thead>
     <tbody>
         {{# submissions }}
@@ -95,7 +97,9 @@
                     {{/ extensionsok}}
                 </td>
                 <td class="w-25">{{ files }}</td>
-                <td><a class="btn btn-info btn-sm" href="{{{ loglink }}}">{{# str }}log, report_assign{{/ str }}</a></td>
+                {{# canviewlogs }}
+                    <td><a class="btn btn-info btn-sm" href="{{{ loglink }}}">{{# str }}log, report_assign{{/ str }}</a></td>
+                {{/ canviewlogs }}
             </tr>
         {{/ submissions }}
     <tbody>
