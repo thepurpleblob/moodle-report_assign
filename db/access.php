@@ -55,6 +55,15 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         ),
     ),
+
+    'report/assign:viewlog' => array(
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        ),
+    ),
 );
 
 

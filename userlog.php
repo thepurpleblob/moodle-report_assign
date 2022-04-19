@@ -45,8 +45,7 @@ $PAGE->set_heading($course->fullname);
 // Security.
 $output = $PAGE->get_renderer('report_assign');
 $context = context_course::instance($course->id);
-require_capability('mod/assign:grade', $context);
-require_capability('report/assign:view', $context);
+require_capability('report/assign:viewlog', $context);
 
 $assignment = $DB->get_record('assign', ['id' => $assignid], '*', MUST_EXIST);
 

@@ -83,6 +83,7 @@ class reportassign implements renderable, templatable {
         return [
             'canrevealnames' => has_capability('report/assign:shownames', $this->context) && $this->assignment->blindmarking,
             'canexport' => has_capability('report/assign:export', $this->context),
+            'canviewlogs' => has_capability('report/assign:viewlog', $this->context),
             'baseurl' => $this->fullurl,
             'backurl' => new \moodle_url('/report/assign/index.php', ['id' => $this->course->id]),
             'submissions' => array_values($this->submissions),
