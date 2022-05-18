@@ -19,6 +19,7 @@
             <tr>
                 <th>{{# str }}name{{/ str }}</th>
                 <th>{{# str }}status{{/ str }}</th>
+                <th>{{# str }}submitted, report_assign{{/ str }}</th>
                 <th>{{# str }}groupmode{{/ str }}</th>
                 {{# enableplagiarism }}
                     <th>{{# str }}plagiarism, report_assign{{/ str }}</th>
@@ -47,6 +48,7 @@
                             <span class="badge badge-dark">{{# str }}groupsubmission, report_assign{{/ str }}</span>
                         {{/ groupsubmission }}
                     </td>
+                    <td>{{ submitcount }}</td>
                     <td>{{ groupmode }}</td>
                     {{# enableplagiarism }}
                         <td>
@@ -58,6 +60,7 @@
                         <div class="btn-group">
                             <a href="{{{ showlink }}}" class="btn btn-sm btn-primary"><i class="fa fa-list"></i> {{# str }}show{{/ str }}</a>&nbsp;
                             <a href="{{{ exportlink }}}" class="btn btn-sm btn-success"><i class="fa fa-share-square-o"></i> {{# str }}export, report_assign{{/ str }}</a>&nbsp;
+                            <a href="{{{ offlinelink }}}" class="btn btn-sm btn-secondary"><i class="fa fa-check-circle"></i> {{# str }}offline, report_assign{{/ str }}</a>&nbsp;
                             <a href="{{{ dumplink }}}" class="btn btn-sm btn-warning"><i class="fa fa-download"></i> {{# str }}download{{/ str }}</a>
                         </div>
                     </td>

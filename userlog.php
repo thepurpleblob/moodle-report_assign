@@ -59,18 +59,21 @@ $eventfilter = [
     '\mod_assign\event\submission_form_viewed' => 'eventsubmissionformviewed',
     '\mod_assign\event\submission_viewed' => 'eventsubmissionviewed',
 ];
+$events = array_keys($eventfilter);
 
 $dateformat = get_string('strftimedatetimeshort', 'langconfig');
-list($insql, $params) = $DB->get_in_or_equal(array_keys($eventfilter), SQL_PARAMS_NAMED);
+
+// Don't check eventname in SQL as it's not indexed :(
 $sql = 'SELECT * FROM {logstore_standard_log}
-    WHERE (userid = :userid OR relateduserid = :relateduserid) 
+    WHERE userid = :userid 
     AND contextinstanceid = :cmid
-    AND eventname ' . $insql . '
     ORDER BY timecreated DESC';
 $params['userid'] = $userid;
-$params['relateduserid'] = $userid;
 $params['cmid'] = $cmid;
 $logs = $DB->get_records_sql($sql, $params);
+$logs = array_filter($logs, function($v, $k) use ($events) {
+    return in_array($v->eventname, $events);
+}, ARRAY_FILTER_USE_BOTH);
 
 foreach ($logs as $log) {
     $log->selfaction = $log->userid == $userid;

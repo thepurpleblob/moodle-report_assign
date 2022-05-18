@@ -63,6 +63,7 @@ class lib {
             $context = \context_module::instance($cm->id);
             $assignment = new \assign($context, $cm, $course);
             $instance = $assignment->get_instance();
+            $instance->submitcount = $assignment->count_submissions_with_status(ASSIGN_SUBMISSION_STATUS_SUBMITTED);
             $instance->urkundenabled = self::urkund_enabled($instance->id);
             $instance->turnitinenabled = self::turnitin_enabled($instance->id);
             $assignments[$instance->id] = $instance;
@@ -569,7 +570,8 @@ class lib {
                 $submission->grade = '-';
                 $submission->grader = '-';
             }
-            $submission->participantno = empty($submission->recordid) ? '-' : $submission->recordid;
+            //$submission->participantno = empty($submission->recordid) ? '-' : $submission->recordid;
+            $submission->participantno = \assign::get_uniqueid_for_user_static($assid, $userid);
             list($submission->groups, $submission->groupids) = self::get_user_groups($userid, $courseid);
             $submission->urkund = self::get_urkund_score($assid, $cmid, $userid);
             $submission->turnitin = self::get_turnitin_score($assid, $cmid, $userid);
@@ -756,6 +758,86 @@ class lib {
             $myxls->write_string($row, $i++, $s->files);
             $row++;
         }
+        $workbook->close();
+    }
+
+    /**
+     * Export for offline marking
+     * @param object $assignment
+     * @param string $filename
+     * @param array $submissions
+     */
+    public static function offline($assignment, $filename, $submissions) {
+        global $CFG, $DB;
+        require_once($CFG->dirroot.'/lib/excellib.class.php');
+
+        // Profile fields.
+        $profilefields = [];
+        $fields = get_config('report_assign', 'profilefields');
+        if ($fields != '') {
+            $profilefields = explode(',', $fields);
+        }
+
+        // We treat idnumber differently (specific user request)
+        $idnumber = array_search('idnumber', $profilefields);
+
+        // Group mode?
+        $cm = get_coursemodule_from_instance('assign', $assignment->id);
+        $groupmode = $cm->groupmode;
+
+        // Create workbook
+        $workbook = new \MoodleExcelWorkbook("-");
+        $workbook->send($filename);
+        $myxls = $workbook->add_worksheet(get_string('offlineworkbook', 'report_assign'));
+
+        // Headers.
+        $i = 0;
+        $myxls->write_string(0, $i++, get_string('recordid', 'assign'));
+        $myxls->write_string(0, $i++, get_string('idnumber'));
+        $myxls->write_string(0, $i++, get_string('gradenoun'));
+        $myxls->write_string(0, $i++, get_string('lastmodifiedgrade', 'assign'));
+        $myxls->write_string(0, $i++, get_string('fullname'));
+        foreach ($profilefields as $profilefield) {
+            if ($profilefield == 'idnumber') {
+                continue;
+            }
+            $myxls->write_string(0, $i++, get_string($profilefield));
+        }
+
+        // Add some data.
+        $row = 1;
+        foreach ($submissions as $s) {
+
+            // Fullname
+            $fullname = '-';
+            if (!$assignment->blindmarking) {
+                if ($user = $DB->get_record('user', ['id' => $s->userid])) {
+                    $fullname = fullname($user);
+                }
+            }
+
+            // Grade
+            $grade = $s->grade == '-' ? '' : $s->grade;
+
+            $i = 0;
+            $myxls->write_string($row, $i++, 'Participant ' . $s->participantno);
+            $myxls->write_string($row, $i++, $s->idnumber);
+            $myxls->write_string($row, $i++, $grade);
+            $myxls->write_string($row, $i++, ' ');
+            $myxls->write_string($row, $i++, $fullname);
+            if ($fields != '') {
+
+                foreach ($s->profiledata as $key => $value) {
+                    if ($idnumber == $key) {
+                        continue;
+                    }
+                    $myxls->write_string($row, $i++, $value);
+                }
+            }
+
+            $row++;
+        }
+
         $workbook->close();
     }
 
