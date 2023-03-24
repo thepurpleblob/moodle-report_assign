@@ -886,6 +886,18 @@ class lib {
         if ($isturnitin) {
             $myxls->write_string(1, $i++, get_string('turnitin', 'report_assign'));
         }
+        $hasworflow = array_reduce($submissions, function($c, $it) {
+            return $c === true ? true : $it->workflow !== '-';
+        }, false);
+        $hasmarker = array_reduce($submissions, function($c, $it) {
+            return $c === true ? true : $it->marker !== '-';
+        }, false);
+        if($hasworflow) {
+            $myxls->write_string(1, $i++, get_string('workflow', 'report_assign'));
+        }
+        if($hasmarker) {
+            $myxls->write_string(1, $i++, get_string('allocatedmarker', 'report_assign'));
+        }
         $myxls->write_string(1, $i++, get_string('allocatedmarker', 'report_assign'));
         $myxls->write_string(1, $i++, get_string('modified'));
         $myxls->write_string(1, $i++, get_string('duedate', 'report_assign'));
@@ -914,6 +926,12 @@ class lib {
             }
             if ($isturnitin) {
                 $myxls->write_string($row, $i++, isset($s->turnitin->similarityscore) ? $s->turnitin->similarityscore : '-');
+            }
+            if($hasworflow) {
+                $myxls->write_string($row, $i++, $s->workflow);
+            }
+            if($hasmarker) {
+                $myxls->write_string($row, $i++, $s->marker);
             }
             $myxls->write_string($row, $i++, isset($s->grader) ? $s->grader : '-');
             $myxls->write_string($row, $i++, $s->modified);
