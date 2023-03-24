@@ -488,7 +488,7 @@ class lib {
         $workflow = '-';
         $marker = '-';
         if (!empty($userflags)) {
-            $workflow = empty($userflags->workflowstate) ? '-' : $userflags->workflowstate;
+            $workflow = empty($userflags->workflowstate) ? '-' : get_string('markingworkflowstate' . $userflags->workflowstate, 'mod_assign');
             if ($userflags->allocatedmarker) {
                 if ($user = $DB->get_record('user', ['id' => $userflags->allocatedmarker])) {
                     $marker = fullname($user);
