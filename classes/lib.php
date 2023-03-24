@@ -886,7 +886,7 @@ class lib {
         if ($isturnitin) {
             $myxls->write_string(1, $i++, get_string('turnitin', 'report_assign'));
         }
-        $myxls->write_string(1, $i++, get_string('allocatedmarker', 'report_assign'));
+        $myxls->write_string(1, $i++, get_string('grader', 'report_assign'));
         $myxls->write_string(1, $i++, get_string('modified'));
         $myxls->write_string(1, $i++, get_string('duedate', 'report_assign'));
         $myxls->write_string(1, $i++, get_string('extension', 'report_assign'));
