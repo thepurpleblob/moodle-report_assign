@@ -64,6 +64,7 @@ class lib {
             $assignment = new \assign($context, $cm, $course);
             $instance = $assignment->get_instance();
             $instance->submitcount = $assignment->count_submissions_with_status(ASSIGN_SUBMISSION_STATUS_SUBMITTED);
+            $instance->releasedcount = $DB->count_records_sql('SELECT COUNT(*) FROM {assign_user_flags} WHERE assignment = :id and workflowstate = :wf', ['id' => $instance->id, 'wf' => 'released',]);
             $instance->urkundenabled = self::urkund_enabled($instance->id);
             $instance->turnitinenabled = self::turnitin_enabled($instance->id);
             $assignments[$instance->id] = $instance;
@@ -161,7 +162,7 @@ class lib {
 
         if (self::turnitin_enabled($assid)) {
             if ($turnitins = $DB->get_records('plagiarism_turnitin_files',
-                ['cm' => $cmid, 'userid' => $userid, 'statuscode' => 'success'], 'id DESC')) {
+                ['cm' => $cmid, 'userid' => $userid], 'id DESC')) {
                 return reset($turnitins);
             }
             return null;
@@ -488,7 +489,7 @@ class lib {
         $workflow = '-';
         $marker = '-';
         if (!empty($userflags)) {
-            $workflow = empty($userflags->workflowstate) ? '-' : $userflags->workflowstate;
+            $workflow = empty($userflags->workflowstate) ? '-' : get_string($userflags->workflowstate, 'report_assign');
             if ($userflags->allocatedmarker) {
                 if ($user = $DB->get_record('user', ['id' => $userflags->allocatedmarker])) {
                     $marker = fullname($user);
@@ -711,8 +712,10 @@ class lib {
         if ($turnitinenabled = self::turnitin_enabled($assignment->id)) {
             $myxls->write_string(3, $i++, get_string('turnitin', 'report_assign'));
         }
-        if ($assignment->markingallocation) {
+        if ($assignment->markingworkflow) {
             $myxls->write_string(3, $i++, get_string('workflow', 'report_assign'));
+        }
+        if ($assignment->markingallocation) {
             $myxls->write_string(3, $i++, get_string('allocatedmarker', 'report_assign'));
         }
         $myxls->write_string(3, $i++, get_string('grader', 'report_assign'));
@@ -747,8 +750,10 @@ class lib {
                 $turnitinscore = empty($s->turnitin->similarityscore) ? '-' : $s->turnitin->similarityscore;
                 $myxls->write_string($row, $i++, $turnitinscore);
             }
-            if ($assignment->markingallocation) {
+            if ($assignment->markingworkflow) {
                 $myxls->write_string($row, $i++, $s->workflow);
+            }
+            if ($assignment->markingallocation) {
                 $myxls->write_string($row, $i++, $s->marker);
             }
             $myxls->write_string($row, $i++, $s->grader);
@@ -797,6 +802,7 @@ class lib {
         $myxls->write_string(0, $i++, get_string('gradenoun'));
         $myxls->write_string(0, $i++, get_string('lastmodifiedgrade', 'assign'));
         $myxls->write_string(0, $i++, get_string('fullname'));
+        $myxls->write_string(0, $i++, get_string('submissionstatus' , 'report_assign'));
         foreach ($profilefields as $profilefield) {
             if ($profilefield == 'idnumber') {
                 continue;
@@ -825,6 +831,9 @@ class lib {
             $myxls->write_string($row, $i++, $grade);
             $myxls->write_string($row, $i++, ' ');
             $myxls->write_string($row, $i++, $fullname);
+            $myxls->write_string($row, $i++, $s->status);
+            
+
             if ($fields != '') {
 
                 foreach ($s->profiledata as $key => $value) {
@@ -879,7 +888,7 @@ class lib {
         }
         $myxls->write_string(1, $i++, get_string('groups'));
         $myxls->write_string(1, $i++, get_string('status'));
-        $myxls->write_string(1, $i++, get_string('grade'));
+        $myxls->write_string(1, $i++, get_string('grade', 'report_assign'));
         if ($isurkund) {
             $myxls->write_string(1, $i++, get_string('urkund', 'report_assign'));
         }

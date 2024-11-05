@@ -38,8 +38,10 @@
         {{# turnitinenabled }}
             <th>{{# str }}turnitin, report_assign{{/ str }}</th>
         {{/ turnitinenabled }}
-        {{# assignment.markingallocation }}
+        {{# assignment.markingworkflow }}
             <th>{{# str }}workflow, report_assign{{/ str }}</th>
+        {{/ assignment.markingworkflow }}
+        {{# assignment.markingallocation }}
             <th>{{# str }}allocatedmarker, report_assign{{/ str }}</th>
         {{/ assignment.markingallocation }}
         <th>{{# str }}grader, report_assign{{/ str }}</th>
@@ -80,8 +82,10 @@
                         {{/ turnitin }}
                     </td>
                 {{/ turnitinenabled }}
-                {{# assignment.markingallocation }}
+                {{# assignment.markingworkflow }}
                     <td>{{ workflow }}</td>
+                {{/ assignment.markingworkflow }}
+                {{# assignment.markingallocation }}
                     <td>{{ marker }}</td>
                 {{/ assignment.markingallocation }}
                 <td>{{ grader }}</td>
